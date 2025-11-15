@@ -11,6 +11,15 @@ public record ApiResponse<T>(
         String message,
         @JsonInclude(JsonInclude.Include.NON_NULL) T data
 ) {
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(
+                SuccessType.SUCCESS.getHttpStatus().value(),
+                SuccessType.SUCCESS.getCode(),
+                SuccessType.SUCCESS.getMessage(),
+                data
+        );
+    }
+
     public static <T> ApiResponse<T> success(SuccessType success, T data) {
         return new ApiResponse<>(
                 success.getHttpStatus().value(),
