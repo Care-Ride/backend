@@ -38,25 +38,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
+        try {
+            if (authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
 
-        Long memberId = jwtUtil.validateAndExtractUserId(token);
+                Long memberId = jwtUtil.validateAndExtractMemberId(token);
+                Member member = memberRepository.findById(memberId)
+                        .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BaseException(ErrorType.NOT_FOUND));
-
-        if (member != null) {
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            member,
-                            null,
-                            null
-                    );
-
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                new MemberPrincipal(member),
+                                null,
+                                null
+                        );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            filterChain.doFilter(request, response);
         }
+        catch (BaseException e) {
+            setErrorResponse(response, e.getErrorType());
+        }
+        catch (Exception e) {
+            setErrorResponse(response, ErrorType.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-        filterChain.doFilter(request, response);
+    private void setErrorResponse(HttpServletResponse response, ErrorType errorType) throws IOException {
+
+        response.setStatus(errorType.getHttpStatus().value());
+        response.setContentType("application/json; charset=UTF-8");
+
+        String json = String.format(
+                "{ \"status\": %d, \"code\": \"%s\", \"message\": \"%s\", \"data\": null }",
+                errorType.getHttpStatus().value(),
+                errorType.getCode(),
+                errorType.getMessage()
+        );
+
+        response.getWriter().write(json);
     }
 }
