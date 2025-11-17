@@ -1,6 +1,6 @@
 package backend.knowhow.domain.auth.domain;
 
-import backend.knowhow.domain.auth.dto.KakaoUserInfo;
+import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
