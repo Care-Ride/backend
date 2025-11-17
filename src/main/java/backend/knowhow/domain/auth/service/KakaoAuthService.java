@@ -7,34 +7,52 @@ import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class KakaoAuthService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final WebClient webClient = WebClient.builder()
+            .baseUrl("https://kapi.kakao.com")
+            .build();
+
     public KakaoUserInfo getUserInfo(String accessToken) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+        KakaoUserResponse response;
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
-        ResponseEntity<KakaoUserResponse> response =
-                restTemplate.exchange(
-                        "https://kapi.kakao.com/v2/user/me",
-                        HttpMethod.GET,
-                        entity,
-                        KakaoUserResponse.class
-                );
-        KakaoUserResponse body = response.getBody();
-        if (body == null || body.getId() == null) {
+        try {
+            response = webClient.get()
+                    .uri("/v2/user/me")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::is4xxClientError,
+                            clientError -> Mono.error(new BaseException(ErrorType.KAKAO_TOKEN_INVALID))
+                    )
+                    .onStatus(
+                            HttpStatusCode::is5xxServerError,
+                            serverError -> Mono.error(new BaseException(ErrorType.EXTERNAL_API_ERROR))
+                    )
+                    .bodyToMono(KakaoUserResponse.class)
+                    .block();
+
+        } catch (BaseException e) {
+            throw e;
+
+        } catch (Exception e) {
+            throw new BaseException(ErrorType.EXTERNAL_API_ERROR);
+        }
+
+
+        if (response == null || response.getId() == null) {
             throw new BaseException(ErrorType.KAKAO_TOKEN_INVALID);
         }
+
         return new KakaoUserInfo(
-                body.getId(),
-                body.getProperties().getNickname()
+                response.getId(),
+                response.getProperties().getNickname()
         );
     }
 }
