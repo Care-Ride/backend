@@ -1,13 +1,14 @@
 package backend.knowhow.global.config;
 
+import backend.knowhow.global.common.exception.BaseException;
+import backend.knowhow.global.common.response.ErrorType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.PostConstruct;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -16,20 +17,24 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final long EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 7일
-
-    @PostConstruct
-    private void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    private byte[] getSigningKey() {
+        return secretKey.getBytes(StandardCharsets.UTF_8);
     }
 
 
-    public String generateToken(Long userId) {
+    public String createAccessToken(Long memberId) {
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setSubject(String.valueOf(memberId))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
+                .signWith(Keys.hmacShaKeyFor(getSigningKey()))
+                .compact();
+    }
+
+    public String createRefreshToken(Long memberId) {
+        return Jwts.builder()
+                .setSubject(String.valueOf(memberId))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 14일
+                .signWith(Keys.hmacShaKeyFor(getSigningKey()))
                 .compact();
     }
 
