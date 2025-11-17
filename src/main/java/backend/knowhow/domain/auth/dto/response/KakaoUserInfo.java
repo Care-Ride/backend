@@ -1,4 +1,4 @@
-package backend.knowhow.domain.auth.dto;
+package backend.knowhow.domain.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
