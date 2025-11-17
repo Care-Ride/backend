@@ -33,14 +33,25 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 검증 + userId 추출
-    public Long validateAndExtractUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    public Long validateAndExtractMemberId(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-        return Long.valueOf(claims.getSubject());
+            return Long.valueOf(claims.getSubject());
+
+        } catch (io.jsonwebtoken.security.SecurityException |
+                 io.jsonwebtoken.MalformedJwtException e) {
+            throw new BaseException(ErrorType.INVALID_TOKEN);
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new BaseException(ErrorType.EXPIRED_TOKEN);
+
+        } catch (Exception e) {
+            throw new BaseException(ErrorType.INVALID_TOKEN);
+        }
     }
 }
