@@ -34,7 +34,7 @@ public class AuthService {
         String refresh = jwtUtil.createRefreshToken(member.getId());
         refreshTokenRepository.save(member.getId(), refresh, 14);
 
-        return new AuthResponse(access);
+        return new AuthResponse(access, refresh);
     }
 
     public String refresh(String refreshToken) {
