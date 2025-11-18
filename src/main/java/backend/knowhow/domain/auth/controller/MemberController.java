@@ -1,6 +1,7 @@
 package backend.knowhow.domain.auth.controller;
 
 import backend.knowhow.domain.auth.domain.Member;
+import backend.knowhow.domain.auth.dto.response.MemberInfoResponse;
 import backend.knowhow.domain.auth.repository.MemberRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ApiResponse;
@@ -20,7 +21,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/me")
-    public ApiResponse<?> getMyInfo(@CurrentUser MemberPrincipal user) {
+    public ApiResponse<MemberInfoResponse> getMyInfo(@CurrentUser MemberPrincipal user) {
 
         Member member = memberRepository.findById(user.getId())
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
@@ -28,16 +29,9 @@ public class MemberController {
         return ApiResponse.success(
                 new MemberInfoResponse(
                         member.getId(),
-                        member.getKakaoId(),
                         member.getNickname()
                 )
         );
     }
-
-    private record MemberInfoResponse(
-            Long id,
-            Long kakaoId,
-            String nickname
-    ) {}
 }
 
