@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
 public class KakaoAuthService {
@@ -29,7 +31,7 @@ public class KakaoAuthService {
                 .onStatus(HttpStatusCode::is5xxServerError,
                         error -> Mono.error(new BaseException(ErrorType.EXTERNAL_API_ERROR)))
                 .bodyToMono(KakaoUserResponse.class)
-                .block();
+                .block(Duration.ofSeconds(5));
 
 
         if (response == null || response.getId() == null) {
