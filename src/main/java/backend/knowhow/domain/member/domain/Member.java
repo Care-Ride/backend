@@ -1,4 +1,4 @@
-package backend.knowhow.domain.auth.domain;
+package backend.knowhow.domain.member.domain;
 
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
 import jakarta.persistence.*;

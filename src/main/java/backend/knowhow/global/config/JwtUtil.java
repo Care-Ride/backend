@@ -1,6 +1,6 @@
 package backend.knowhow.global.config;
 
-import backend.knowhow.domain.auth.domain.Role;
+import backend.knowhow.domain.member.domain.Role;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import io.jsonwebtoken.Claims;

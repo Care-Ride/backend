@@ -1,6 +1,6 @@
-package backend.knowhow.domain.auth.repository;
+package backend.knowhow.domain.member.repository;
 
-import backend.knowhow.domain.auth.domain.Member;
+import backend.knowhow.domain.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
