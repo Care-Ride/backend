@@ -2,6 +2,7 @@ package backend.knowhow.global.config;
 
 import backend.knowhow.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Value("${spring.profiles.active:prod}")
+    private String activeProfile;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -28,10 +32,14 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req -> req
-                        .requestMatchers("/test/**","/auth/**", "/h2-console/**", "/swagger-ui/**","/v3/api-docs/**","/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(req -> {
+                    if (activeProfile.equals("dev") || activeProfile.equals("local")) {
+                        req.requestMatchers("/test/**", "/h2-console/**").permitAll();
+                    }
+                    req.requestMatchers("/auth/**", "/swagger-ui/**","/v3/api-docs/**","/api-docs/**")
+                            .permitAll()
+                            .anyRequest().authenticated();
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
