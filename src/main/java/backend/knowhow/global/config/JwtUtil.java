@@ -1,5 +1,6 @@
 package backend.knowhow.global.config;
 
+import backend.knowhow.domain.auth.domain.Role;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import io.jsonwebtoken.Claims;
@@ -22,9 +23,10 @@ public class JwtUtil {
     }
 
 
-    public String createAccessToken(Long memberId) {
+    public String createAccessToken(Long memberId, Role role) {
         return Jwts.builder()
                 .setSubject(String.valueOf(memberId))
+                .claim("role", role.name())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
                 .signWith(Keys.hmacShaKeyFor(getSigningKey()))
                 .compact();
@@ -38,25 +40,28 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Long validateAndExtractMemberId(String token) {
+    public Claims parseClaims(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
-            return Long.valueOf(claims.getSubject());
-
-        } catch (io.jsonwebtoken.security.SecurityException |
-                 io.jsonwebtoken.MalformedJwtException e) {
-            throw new BaseException(ErrorType.INVALID_TOKEN);
-
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             throw new BaseException(ErrorType.EXPIRED_TOKEN);
-
         } catch (Exception e) {
             throw new BaseException(ErrorType.INVALID_TOKEN);
         }
+    }
+
+    public Long validateAndExtractMemberId(String token) {
+        Claims claims = parseClaims(token);
+        return Long.valueOf(claims.getSubject());
+    }
+
+    public Role extractRole(String token) {
+        Claims claims = parseClaims(token);
+        String role = claims.get("role", String.class);
+        return role != null ? Role.valueOf(role) : null;
     }
 }

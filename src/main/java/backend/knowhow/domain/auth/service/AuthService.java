@@ -1,6 +1,7 @@
 package backend.knowhow.domain.auth.service;
 
 import backend.knowhow.domain.auth.domain.Member;
+import backend.knowhow.domain.auth.domain.Role;
 import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
 import backend.knowhow.domain.auth.repository.MemberRepository;
@@ -28,13 +29,24 @@ public class AuthService {
                 .orElseGet(() -> memberRepository.save(new Member(userInfo)));
 
         // accessToken 발급
-        String access = jwtUtil.createAccessToken(member.getId());
+        String access = jwtUtil.createAccessToken(member.getId(), member.getRole());
 
         // refreshToken 발급
         String refresh = jwtUtil.createRefreshToken(member.getId());
         refreshTokenRepository.save(member.getId(), refresh);
 
         return new AuthResponse(access, refresh);
+    }
+
+    public AuthResponse selectRole(Long memberId, Role role) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        member.setRole(role);
+        memberRepository.save(member);
+
+        String newAccess = jwtUtil.createAccessToken(member.getId(), member.getRole());
+        return new AuthResponse(newAccess, refreshTokenRepository.find(member.getId()));
     }
 
     public String refresh(String refreshToken) {
@@ -50,8 +62,10 @@ public class AuthService {
         if (!savedToken.equals(refreshToken)) {
             throw new BaseException(ErrorType.INVALID_REFRESH_TOKEN);
         }
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
-        return jwtUtil.createAccessToken(memberId);
+        return jwtUtil.createAccessToken(memberId, member.getRole());
     }
 
     public void logout(Long memberId) {
