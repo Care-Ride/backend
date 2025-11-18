@@ -19,8 +19,16 @@ public class Member {
 
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     public Member(KakaoUserInfo info) {
         this.kakaoId = info.getId();
         this.nickname = info.getNickname();
+        this.role = Role.NONE;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
