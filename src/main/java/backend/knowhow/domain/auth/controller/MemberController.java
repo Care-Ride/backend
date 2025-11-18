@@ -2,13 +2,13 @@ package backend.knowhow.domain.auth.controller;
 
 import backend.knowhow.domain.auth.domain.Member;
 import backend.knowhow.domain.auth.dto.request.RoleRequest;
+import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.response.MemberInfoResponse;
 import backend.knowhow.domain.auth.repository.MemberRepository;
 import backend.knowhow.domain.auth.service.AuthService;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.common.response.ErrorType;
-import backend.knowhow.global.common.response.SuccessType;
 import backend.knowhow.global.security.CurrentUser;
 import backend.knowhow.global.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +37,10 @@ public class MemberController {
     }
 
     @PostMapping("/role")
-    public ApiResponse<Void> selectRole(@CurrentUser MemberPrincipal user, @RequestBody RoleRequest request
+    public ApiResponse<AuthResponse> selectRole(@CurrentUser MemberPrincipal user, @RequestBody RoleRequest request
     ) {
-        authService.selectRole(user.getId(), request.role());
-        return ApiResponse.success(SuccessType.SUCCESS);
+        AuthResponse response = authService.selectRole(user.getId(), request.role());
+        return ApiResponse.success(response);
     }
 
 }

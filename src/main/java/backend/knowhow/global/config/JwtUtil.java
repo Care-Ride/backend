@@ -6,6 +6,7 @@ import backend.knowhow.global.common.response.ErrorType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,13 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secretKey;
+
+    @PostConstruct
+    public void init() {
+        if (secretKey == null || secretKey.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT secret key must be at least 32 bytes");
+        }
+    }
 
     private byte[] getSigningKey() {
         return secretKey.getBytes(StandardCharsets.UTF_8);
@@ -62,6 +70,10 @@ public class JwtUtil {
     public Role extractRole(String token) {
         Claims claims = parseClaims(token);
         String role = claims.get("role", String.class);
-        return role != null ? Role.valueOf(role) : null;
+        try {
+            return Role.valueOf(role);
+        } catch (IllegalArgumentException e) {
+            throw new BaseException(ErrorType.INVALID_TOKEN);
+        }
     }
 }
