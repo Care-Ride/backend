@@ -20,30 +20,16 @@ public class KakaoAuthService {
 
     public KakaoUserInfo getUserInfo(String accessToken) {
 
-        KakaoUserResponse response;
-
-        try {
-            response = webClient.get()
-                    .uri("/v2/user/me")
-                    .header("Authorization", "Bearer " + accessToken)
-                    .retrieve()
-                    .onStatus(
-                            HttpStatusCode::is4xxClientError,
-                            clientError -> Mono.error(new BaseException(ErrorType.KAKAO_TOKEN_INVALID))
-                    )
-                    .onStatus(
-                            HttpStatusCode::is5xxServerError,
-                            serverError -> Mono.error(new BaseException(ErrorType.EXTERNAL_API_ERROR))
-                    )
-                    .bodyToMono(KakaoUserResponse.class)
-                    .block();
-
-        } catch (BaseException e) {
-            throw e;
-
-        } catch (Exception e) {
-            throw new BaseException(ErrorType.EXTERNAL_API_ERROR);
-        }
+        KakaoUserResponse response = webClient.get()
+                .uri("/v2/user/me")
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        error -> Mono.error(new BaseException(ErrorType.KAKAO_TOKEN_INVALID)))
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        error -> Mono.error(new BaseException(ErrorType.EXTERNAL_API_ERROR)))
+                .bodyToMono(KakaoUserResponse.class)
+                .block();
 
 
         if (response == null || response.getId() == null) {
