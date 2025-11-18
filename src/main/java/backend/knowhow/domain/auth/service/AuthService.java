@@ -32,7 +32,7 @@ public class AuthService {
 
         // refreshToken 발급
         String refresh = jwtUtil.createRefreshToken(member.getId());
-        refreshTokenRepository.save(member.getId(), refresh, 14);
+        refreshTokenRepository.save(member.getId(), refresh);
 
         return new AuthResponse(access, refresh);
     }

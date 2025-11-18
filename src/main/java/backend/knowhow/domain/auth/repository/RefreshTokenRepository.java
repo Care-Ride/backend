@@ -13,12 +13,13 @@ public class RefreshTokenRepository {
     private final StringRedisTemplate redisTemplate;
 
     private static final String PREFIX = "refresh:";
+    private static final long REFRESH_TOKEN_DAYS = 14;
 
-    public void save(Long memberId, String refreshToken, long days) {
+    public void save(Long memberId, String refreshToken) {
         redisTemplate.opsForValue().set(
                 PREFIX + memberId,
                 refreshToken,
-                Duration.ofDays(days)
+                Duration.ofDays(REFRESH_TOKEN_DAYS)
         );
     }
 
