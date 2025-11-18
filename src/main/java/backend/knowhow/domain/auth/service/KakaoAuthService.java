@@ -35,6 +35,9 @@ public class KakaoAuthService {
         if (response == null || response.getId() == null) {
             throw new BaseException(ErrorType.KAKAO_TOKEN_INVALID);
         }
+        if (response.getProperties() == null || response.getProperties().getNickname() == null) {
+            throw new BaseException(ErrorType.KAKAO_TOKEN_INVALID);
+        }
 
         return new KakaoUserInfo(
                 response.getId(),
