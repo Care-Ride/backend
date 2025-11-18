@@ -21,7 +21,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/kakao")
-    public ApiResponse<?> loginKakao(@RequestBody KakaoLoginRequest request) {
+    public ApiResponse<AuthResponse> loginKakao(@RequestBody KakaoLoginRequest request) {
 
         AuthResponse response = authService.loginKakao(request.getAccessToken());
 
@@ -29,13 +29,13 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ApiResponse<?> refresh(@RequestBody ReissueRequest request) {
+    public ApiResponse<AuthResponse> refresh(@RequestBody ReissueRequest request) {
         String accessToken = authService.refresh(request.refreshToken());
         return ApiResponse.success(new AuthResponse(accessToken, request.refreshToken()));
     }
 
     @PostMapping("/logout")
-    public ApiResponse<?> logout(@CurrentUser MemberPrincipal member) {
+    public ApiResponse<Void> logout(@CurrentUser MemberPrincipal member) {
         authService.logout(member.getId());
         return ApiResponse.success(null);
     }
