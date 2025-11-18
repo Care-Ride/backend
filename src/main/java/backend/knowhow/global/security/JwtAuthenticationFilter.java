@@ -41,24 +41,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            if (authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
+            String token = authHeader.substring(7);
+            Long memberId = jwtUtil.validateAndExtractMemberId(token);
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+            SimpleGrantedAuthority authority =
+                    new SimpleGrantedAuthority("ROLE_" + member.getRole().name());
 
-                Long memberId = jwtUtil.validateAndExtractMemberId(token);
-                Member member = memberRepository.findById(memberId)
-                        .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
-                SimpleGrantedAuthority authority =
-                        new SimpleGrantedAuthority("ROLE_" + member.getRole().name());
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                new MemberPrincipal(member),
-                                null,
-                                List.of(authority)
-                        );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            new MemberPrincipal(member),
+                            null,
+                            List.of(authority)
+                    );
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         }
         catch (BaseException e) {

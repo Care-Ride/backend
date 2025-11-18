@@ -46,7 +46,9 @@ public class AuthService {
         memberRepository.save(member);
 
         String newAccess = jwtUtil.createAccessToken(member.getId(), member.getRole());
-        return new AuthResponse(newAccess, refreshTokenRepository.find(member.getId()));
+        String newRefresh = jwtUtil.createRefreshToken(member.getId());
+        refreshTokenRepository.save(member.getId(), newRefresh);
+        return new AuthResponse(newAccess, newRefresh);
     }
 
     public String refresh(String refreshToken) {
