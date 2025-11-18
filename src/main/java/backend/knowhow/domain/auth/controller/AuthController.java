@@ -4,6 +4,7 @@ import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.request.KakaoLoginRequest;
 import backend.knowhow.domain.auth.dto.request.ReissueRequest;
 import backend.knowhow.domain.auth.service.AuthService;
+import backend.knowhow.domain.auth.dto.request.RoleRequest;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
 import backend.knowhow.global.security.MemberPrincipal;
@@ -25,6 +26,13 @@ public class AuthController {
 
         AuthResponse response = authService.loginKakao(request.getAccessToken());
 
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/role")
+    public ApiResponse<AuthResponse> selectRole(@CurrentUser MemberPrincipal user, @RequestBody RoleRequest request
+    ) {
+        AuthResponse response = authService.selectRole(user.getId(), request.role());
         return ApiResponse.success(response);
     }
 

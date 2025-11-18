@@ -1,7 +1,7 @@
 package backend.knowhow.global.security;
 
-import backend.knowhow.domain.auth.domain.Member;
-import backend.knowhow.domain.auth.repository.MemberRepository;
+import backend.knowhow.domain.member.domain.Member;
+import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import backend.knowhow.global.config.JwtUtil;

@@ -1,7 +1,7 @@
 package backend.knowhow.global.security;
 
-import backend.knowhow.domain.auth.domain.Member;
-import backend.knowhow.domain.auth.domain.Role;
+import backend.knowhow.domain.member.domain.Member;
+import backend.knowhow.domain.member.domain.Role;
 import lombok.Getter;
 
 @Getter
