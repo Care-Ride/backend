@@ -19,6 +19,7 @@ public class Member {
 
     private String nickname;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Role role;
 
