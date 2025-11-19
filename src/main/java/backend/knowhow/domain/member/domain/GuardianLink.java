@@ -1,13 +1,14 @@
 package backend.knowhow.domain.member.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"guardian_id", "senior_id"}))
 public class GuardianLink {
 
@@ -22,5 +23,10 @@ public class GuardianLink {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "senior_id", nullable = false)
     private Member senior;
+
+    public GuardianLink(Member guardian, Member senior) {
+        this.guardian = guardian;
+        this.senior = senior;
+    }
 
 }

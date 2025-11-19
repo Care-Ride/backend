@@ -23,10 +23,19 @@ public enum ErrorType {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-402", "만료된 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH-403", "Refresh Token을 찾을 수 없습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-404", "Refresh Token이 유효하지 않습니다."),
+    TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH-400", "인증이 필요합니다. Authorization 헤더가 비어있습니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "AUTH-403", "접근 권한이 없습니다."),
 
     // OAuth
     KAKAO_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "KAKAO-401", "카카오 AccessToken이 유효하지 않습니다."),
-    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL-500", "외부 API 호출 중 오류가 발생했습니다.");
+    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL-500", "외부 API 호출 중 오류가 발생했습니다."),
+
+    // Connection
+    INVALID_CONNECTION_CODE(HttpStatus.BAD_REQUEST, "CONNECT-400", "연동코드가 올바르지 않거나 만료되었습니다."),
+    ALREADY_LINKED(HttpStatus.CONFLICT, "CONNECT-401", "이미 연결된 관계입니다."),
+    CONNECTION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-402", "연동코드를 찾을 수 없습니다.");
+
+
 
 
 

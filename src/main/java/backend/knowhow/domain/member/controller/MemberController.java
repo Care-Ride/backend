@@ -1,8 +1,10 @@
 package backend.knowhow.domain.member.controller;
 
-import backend.knowhow.domain.auth.dto.request.RoleRequest;
-import backend.knowhow.domain.auth.dto.response.AuthResponse;
+import backend.knowhow.domain.member.dto.request.ConnectRequest;
+import backend.knowhow.domain.member.dto.response.ConnectionCodeResponse;
 import backend.knowhow.domain.member.dto.response.MemberInfoResponse;
+import backend.knowhow.domain.member.service.ConnectionCodeService;
+import backend.knowhow.domain.member.service.GuardianLinkService;
 import backend.knowhow.domain.member.service.MemberService;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final ConnectionCodeService connectionCodeService;
+    private final GuardianLinkService guardianLinkService;
 
     @GetMapping("/me")
     public ApiResponse<MemberInfoResponse> getMyInfo(@CurrentUser MemberPrincipal user) {
@@ -24,7 +28,24 @@ public class MemberController {
         return ApiResponse.success(response);
     }
 
+    @PostMapping("/link/generate")
+    public ApiResponse<ConnectionCodeResponse> generate(@CurrentUser MemberPrincipal user) {
+        Long seniorId = user.getId();
+        String code = connectionCodeService.generateCode(seniorId);
 
+        return ApiResponse.success(new ConnectionCodeResponse(code, 300));
+    }
+
+    @PostMapping("/link/connect")
+    public ApiResponse<Void> connect(
+            @CurrentUser MemberPrincipal guardian,
+            @RequestBody ConnectRequest request
+    ) {
+        Long seniorId = connectionCodeService.verifyCode(request.code());
+        guardianLinkService.link(guardian.getId(), seniorId);
+        connectionCodeService.deleteCode(request.code());
+
+        return ApiResponse.success();
+    }
 
 }
-
