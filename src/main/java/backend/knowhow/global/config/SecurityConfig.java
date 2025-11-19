@@ -1,5 +1,7 @@
 package backend.knowhow.global.config;
 
+import backend.knowhow.global.security.CustomAccessDeniedHandler;
+import backend.knowhow.global.security.CustomAuthenticationEntryPoint;
 import backend.knowhow.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,8 @@ public class SecurityConfig {
     private String activeProfile;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,6 +36,10 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .authorizeHttpRequests(req -> {
                     if (activeProfile.equals("dev") || activeProfile.equals("local")) {
                         req.requestMatchers("/test/**", "/h2-console/**").permitAll();
