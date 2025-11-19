@@ -20,6 +20,15 @@ public record ApiResponse<T>(
         );
     }
 
+    public static <T> ApiResponse<T> success() {
+        return new ApiResponse<>(
+                SuccessType.SUCCESS.getHttpStatus().value(),
+                SuccessType.SUCCESS.getCode(),
+                SuccessType.SUCCESS.getMessage(),
+                null
+        );
+    }
+
     public static <T> ApiResponse<T> success(SuccessType success, T data) {
         return new ApiResponse<>(
                 success.getHttpStatus().value(),
@@ -35,6 +44,8 @@ public record ApiResponse<T>(
                 success.getMessage(),
                 null);
     }
+
+
 
     public static ApiResponse<?> error(ErrorType error) {
         return new ApiResponse<>(
