@@ -33,7 +33,7 @@ public class MemberController {
         Long seniorId = user.getId();
         String code = connectionCodeService.generateCode(seniorId);
 
-        return ApiResponse.success(new ConnectionCodeResponse(code, 300));
+        return ApiResponse.success(new ConnectionCodeResponse(code, connectionCodeService.getExpireSeconds()));
     }
 
     @PostMapping("/link/connect")
