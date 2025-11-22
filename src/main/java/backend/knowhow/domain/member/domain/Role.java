@@ -1,7 +1,7 @@
 package backend.knowhow.domain.member.domain;
 
 public enum Role {
-    DRIVER,
+    SENIOR,
     GUARDIAN,
     NONE
 }

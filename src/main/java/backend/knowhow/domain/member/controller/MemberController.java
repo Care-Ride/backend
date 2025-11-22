@@ -10,6 +10,7 @@ import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
 import backend.knowhow.global.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +29,7 @@ public class MemberController {
         return ApiResponse.success(response);
     }
 
+    @PreAuthorize("hasRole('SENIOR')")
     @PostMapping("/link/generate")
     public ApiResponse<ConnectionCodeResponse> generate(@CurrentUser MemberPrincipal user) {
         Long seniorId = user.getId();
@@ -36,6 +38,7 @@ public class MemberController {
         return ApiResponse.success(new ConnectionCodeResponse(code, connectionCodeService.getExpireSeconds()));
     }
 
+    @PreAuthorize("hasRole('GUARDIAN')")
     @PostMapping("/link/connect")
     public ApiResponse<Void> connect(
             @CurrentUser MemberPrincipal guardian,
