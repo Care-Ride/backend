@@ -2,12 +2,14 @@ package backend.knowhow.domain.driving.service;
 
 import backend.knowhow.domain.driving.domain.DrivingSession;
 import backend.knowhow.domain.driving.domain.WeatherCondition;
+import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
 import backend.knowhow.domain.driving.dto.request.LocationRequest;
 import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
 import backend.knowhow.domain.driving.dto.response.DriveStartResponse;
 import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
 import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
 import backend.knowhow.domain.driving.dto.response.kakao.KakaoPlaceSearchResponse;
+import backend.knowhow.domain.driving.dto.summary.DrivingSessionSummary;
 import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
 import backend.knowhow.domain.driving.service.kakaoMap.KakaoApiClient;
 import backend.knowhow.domain.driving.service.weather.KmaWeatherClient;
@@ -21,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -54,7 +55,6 @@ public class DrivingService {
 
     @Transactional(readOnly = true)
     public PlaceSearchListResponse searchDst(String keyword) {
-        log.info("keyword: {}", keyword);
         // 카카오 키워드 기반 장소 검색 api 호출
         KakaoPlaceSearchResponse kakaoResponse = kakaoApiClient.searchByKeyword(keyword);
 
@@ -73,12 +73,27 @@ public class DrivingService {
 
     @Transactional
     public DriveStartResponse startDriving(Long memberId, LocationRequest request) {
-        log.info("memberId: {}", memberId);
         Member driver = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
         DrivingSession drive = DrivingSession.start(driver, request.getLat(), request.getLon());
         DrivingSession saveDrive = drivingSessionRepository.save(drive);
         return new DriveStartResponse(saveDrive.getId(), saveDrive.getStartTime());
+    }
+
+    @Transactional
+    public DrivingSessionSummary endDriving(Long memberId, DriveEndRequest request) {
+        Member driver = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+        DrivingSession driveSession = drivingSessionRepository.findById(request.getDriveId())
+                .orElseThrow(() -> new BaseException(ErrorType.DRIVE_SESSION_NOT_FOUND));
+        // driveSession 운전자와 로그인한 유저가 다른 경우 에러
+        if(!driveSession.getDriver().equals(driver))
+            throw new BaseException(ErrorType.DRIVE_ACCESS_DENIED);
+
+        driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(), request.getSuddenStopCount(),
+                request.getLat(), request.getLon(), request.getScore());
+
+        return DrivingSessionSummary.from(driveSession);
     }
 }
