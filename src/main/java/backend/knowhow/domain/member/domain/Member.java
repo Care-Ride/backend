@@ -4,6 +4,7 @@ import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -19,6 +20,7 @@ public class Member {
 
     private String nickname;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -28,7 +30,11 @@ public class Member {
         this.role = Role.NONE;
     }
 
-    public void setRole(Role role) {
+    // 테스트 계정 생성자
+    public Member(String nickname, Role role) {
+        this.nickname = nickname;
         this.role = role;
     }
+
+
 }

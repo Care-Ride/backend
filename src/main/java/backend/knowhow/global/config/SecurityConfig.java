@@ -1,10 +1,13 @@
 package backend.knowhow.global.config;
 
+import backend.knowhow.global.security.CustomAccessDeniedHandler;
+import backend.knowhow.global.security.CustomAuthenticationEntryPoint;
 import backend.knowhow.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -22,6 +26,8 @@ public class SecurityConfig {
     private String activeProfile;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,17 +38,31 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .authorizeHttpRequests(req -> {
                     if (activeProfile.equals("dev") || activeProfile.equals("local")) {
-                        req.requestMatchers("/test/**", "/h2-console/**").permitAll();
+                        req.requestMatchers( "/h2-console/**").permitAll();
                     }
-                    req.requestMatchers("/auth/**", "/swagger-ui/**","/v3/api-docs/**","/api-docs/**")
-                            .permitAll()
-                            .anyRequest().authenticated();
+                    req.requestMatchers(
+                            "/auth/kakao",
+                            "/auth/refresh",
+                            "/auth/test/*"
+                    ).permitAll();
+                    req.requestMatchers(
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/api-docs/**"
+                    ).permitAll();
+                    req.requestMatchers("/auth/**").authenticated();
+                    req.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        System.out.println("SecurityConfig loaded!!!");
 
         return http.build();
     }

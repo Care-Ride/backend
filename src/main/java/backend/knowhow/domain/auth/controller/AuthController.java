@@ -45,7 +45,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@CurrentUser MemberPrincipal member) {
         authService.logout(member.getId());
-        return ApiResponse.success(null);
+        return ApiResponse.success();
     }
 
 
