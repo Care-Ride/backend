@@ -58,6 +58,10 @@ public class DrivingService {
         // 카카오 키워드 기반 장소 검색 api 호출
         KakaoPlaceSearchResponse kakaoResponse = kakaoApiClient.searchByKeyword(keyword);
 
+        if (kakaoResponse == null || kakaoResponse.getDocuments() == null) {
+            return new PlaceSearchListResponse(List.of());
+        }
+
         List<PlaceSearchListResponse.PlaceSearch> results = kakaoResponse.getDocuments()
                 .stream()
                 .map(doc -> PlaceSearchListResponse.PlaceSearch.builder()
@@ -87,9 +91,14 @@ public class DrivingService {
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
         DrivingSession driveSession = drivingSessionRepository.findById(request.getDriveId())
                 .orElseThrow(() -> new BaseException(ErrorType.DRIVE_SESSION_NOT_FOUND));
+
         // driveSession 운전자와 로그인한 유저가 다른 경우 에러
         if(!driveSession.getDriver().equals(driver))
             throw new BaseException(ErrorType.DRIVE_ACCESS_DENIED);
+        // 이미 종료처리가 되어있는 경우 에러 처리
+        if(driveSession.getEndTime() != null){
+            throw new BaseException(ErrorType.DRIVE_ALREADY_ENDED);
+        }
 
         driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(), request.getSuddenStopCount(),
                 request.getLat(), request.getLon(), request.getScore());

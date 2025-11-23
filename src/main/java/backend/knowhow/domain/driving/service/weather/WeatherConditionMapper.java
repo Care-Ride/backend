@@ -13,6 +13,14 @@ public class WeatherConditionMapper {
     
     // ultraSrtNcst 응답 전체에서 날씨 정보 뽑아서 최종 ENUM 반환
     public WeatherCondition fromUltraSrtNcst(KmaUltraSrtNcstResponse res) {
+        if (res == null
+                || res.getResponse() == null
+                || res.getResponse().getBody() == null
+                || res.getResponse().getBody().getItems() == null
+                || res.getResponse().getBody().getItems().getItem() == null) {
+            log.warn("[Weather] KMA response is empty, res={}", res);
+            return WeatherCondition.UNKNOWN;
+        }
         List<KmaUltraSrtNcstResponse.Item> items = res.getResponse().getBody().getItems().getItem();
 
         String pty = extractCategory(items, "PTY");  // 강수형태

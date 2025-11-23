@@ -56,8 +56,13 @@ public class KmaWeatherClient {
                 .toUriString();
 
         try {
-            return restTemplate.getForObject(url, KmaUltraSrtNcstResponse.class);
+            KmaUltraSrtNcstResponse response = restTemplate.getForObject(url, KmaUltraSrtNcstResponse.class);
+            if (response == null){
+                throw new BaseException(ErrorType.KMA_WEATHER_ERROR);
+            }
+            return response;
         } catch (Exception e) {
+            log.error("[KmaWeatherClient] getUltraSrtNcst error. lat={}, lan={}, url={}, message={}", lat, lan, url, e.getMessage(), e);
             throw new BaseException(ErrorType.KMA_WEATHER_ERROR);
         }
     }
