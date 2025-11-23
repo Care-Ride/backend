@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BeforeDriveDangerRequest {
+public class LocationRequest {
     private double lat;
     private double lon;
 }

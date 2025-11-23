@@ -1,10 +1,13 @@
 package backend.knowhow.domain.driving.controller;
 
-import backend.knowhow.domain.driving.dto.request.BeforeDriveDangerRequest;
+import backend.knowhow.domain.driving.dto.request.LocationRequest;
 import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
+import backend.knowhow.domain.driving.dto.response.DriveStartResponse;
 import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
 import backend.knowhow.domain.driving.service.DrivingService;
 import backend.knowhow.global.common.response.ApiResponse;
+import backend.knowhow.global.security.CurrentUser;
+import backend.knowhow.global.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +19,7 @@ public class DrivingController {
     private final DrivingService drivingService;
 
     @PostMapping("/danger")
-    public ApiResponse<BeforeDriveDangerResponse> getDanger(@RequestBody BeforeDriveDangerRequest request){
+    public ApiResponse<BeforeDriveDangerResponse> getDanger(@RequestBody LocationRequest request){
         BeforeDriveDangerResponse response = drivingService.getDangerBeforeDrive(request);
         return ApiResponse.success(response);
     }
@@ -24,6 +27,12 @@ public class DrivingController {
     @GetMapping("/dst/search/{keyword}")
     public ApiResponse<PlaceSearchListResponse> searchDst(@PathVariable String keyword){
         PlaceSearchListResponse response = drivingService.searchDst(keyword);
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/start")
+    public ApiResponse<DriveStartResponse> startDriving(@RequestBody LocationRequest locationRequest, @CurrentUser MemberPrincipal user){
+        DriveStartResponse response = drivingService.startDriving(user.getId(), locationRequest);
         return ApiResponse.success(response);
     }
 }

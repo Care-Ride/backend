@@ -1,6 +1,8 @@
 package backend.knowhow.domain.driving.service.weather;
 
 import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
+import backend.knowhow.global.common.exception.BaseException;
+import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,8 +58,7 @@ public class KmaWeatherClient {
         try {
             return restTemplate.getForObject(url, KmaUltraSrtNcstResponse.class);
         } catch (Exception e) {
-            log.error("KMA API 호출 실패", e);
-            throw e; // 혹은 커스텀 예외로 래핑
+            throw new BaseException(ErrorType.KMA_WEATHER_ERROR);
         }
     }
 }
