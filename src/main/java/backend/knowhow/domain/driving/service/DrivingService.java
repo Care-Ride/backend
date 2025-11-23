@@ -4,6 +4,9 @@ import backend.knowhow.domain.driving.domain.WeatherCondition;
 import backend.knowhow.domain.driving.dto.request.BeforeDriveDangerRequest;
 import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
 import backend.knowhow.domain.driving.dto.response.KmaUltraSrtNcstResponse;
+import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
+import backend.knowhow.domain.driving.dto.response.kakao.KakaoPlaceSearchResponse;
+import backend.knowhow.domain.driving.service.kakaoMap.KakaoApiClient;
 import backend.knowhow.domain.driving.service.weather.KmaWeatherClient;
 import backend.knowhow.domain.driving.service.weather.WeatherConditionMapper;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,12 +23,13 @@ import java.time.LocalTime;
 public class DrivingService {
 
     private final KmaWeatherClient kmaWeatherClient;
+    private final KakaoApiClient kakaoApiClient;
     private final WeatherConditionMapper weatherConditionMapper;
 
     private static final LocalTime NIGHT_START = LocalTime.of(20, 0);   // 20:00
     private static final LocalTime NIGHT_END = LocalTime.of(6, 0);  // 6:00
 
-    @Transactional
+    @Transactional(readOnly = true)
     public BeforeDriveDangerResponse getDangerBeforeDrive(BeforeDriveDangerRequest request) {
         // 현재 위치 기준 현재 날씨 조회
         KmaUltraSrtNcstResponse ultraSrtNcst = kmaWeatherClient.getUltraSrtNcst(request.getLat(), request.getLon());
@@ -35,5 +40,24 @@ public class DrivingService {
         boolean isNightNow = now.isAfter(NIGHT_START) || now.isBefore(NIGHT_END);
         
         return new BeforeDriveDangerResponse(isNightNow, weatherCondition);
+    }
+
+    @Transactional(readOnly = true)
+    public PlaceSearchListResponse searchDst(String keyword) {
+        log.info("keyword: {}", keyword);
+        // 카카오 키워드 기반 장소 검색 api 호출
+        KakaoPlaceSearchResponse kakaoResponse = kakaoApiClient.searchByKeyword(keyword);
+
+        List<PlaceSearchListResponse.PlaceSearch> results = kakaoResponse.getDocuments()
+                .stream()
+                .map(doc -> PlaceSearchListResponse.PlaceSearch.builder()
+                        .name(doc.getPlaceName())
+                        .address(doc.getAddressName())
+                        .roadAddress(doc.getRoadAddressName())
+                        .lat(doc.getY())
+                        .lon(doc.getX())
+                        .build())
+                .toList();
+        return new PlaceSearchListResponse(results);
     }
 }

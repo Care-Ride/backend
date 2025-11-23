@@ -26,14 +26,14 @@ public enum ErrorType {
 
     // OAuth
     KAKAO_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "KAKAO-401", "카카오 AccessToken이 유효하지 않습니다."),
-    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL-500", "외부 API 호출 중 오류가 발생했습니다.");
+    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL-500", "외부 API 호출 중 오류가 발생했습니다."),
 
-
+    // driving
+    KAKAO_MAP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO-500", "카카오 지도 API 호출 중 오류가 발생했습니다."),
+    KMA_WEATHER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KMA-500", "기상청 API 호출 중 오류가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
-
-
 
 }
