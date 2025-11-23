@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class KakaoApiClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${kakao.map.kakao-api-key}")
     private String kakaoApiKey;
