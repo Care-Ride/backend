@@ -1,7 +1,7 @@
 package backend.knowhow.domain.driving.service.weather;
 
 import backend.knowhow.domain.driving.domain.WeatherCondition;
-import backend.knowhow.domain.driving.dto.response.KmaUltraSrtNcstResponse;
+import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package backend.knowhow.domain.driving.dto.response;
+package backend.knowhow.domain.driving.dto.response.weather;
 
 import lombok.Data;
 

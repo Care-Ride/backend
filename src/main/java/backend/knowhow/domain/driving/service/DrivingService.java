@@ -3,7 +3,7 @@ package backend.knowhow.domain.driving.service;
 import backend.knowhow.domain.driving.domain.WeatherCondition;
 import backend.knowhow.domain.driving.dto.request.BeforeDriveDangerRequest;
 import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
-import backend.knowhow.domain.driving.dto.response.KmaUltraSrtNcstResponse;
+import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
 import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
 import backend.knowhow.domain.driving.dto.response.kakao.KakaoPlaceSearchResponse;
 import backend.knowhow.domain.driving.service.kakaoMap.KakaoApiClient;

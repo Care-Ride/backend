@@ -1,6 +1,6 @@
 package backend.knowhow.domain.driving.service.weather;
 
-import backend.knowhow.domain.driving.dto.response.KmaUltraSrtNcstResponse;
+import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
