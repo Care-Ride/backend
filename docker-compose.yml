@@ -19,7 +19,7 @@ services:
       MYSQL_PORT: 3306
       MYSQL_DATABASE: careridedb
       MYSQL_USER: root
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
 
   redis:
     image: redis:7.2
@@ -44,7 +44,7 @@ services:
     volumes:
       - test-mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       retries: 10
       timeout: 5s
