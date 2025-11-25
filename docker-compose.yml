@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend:
     image: jaehyuun/careride
@@ -6,10 +8,18 @@ services:
       - "8080:8080"
     restart: always
     depends_on:
-      - redis
+      redis:
+        condition: service_started
+      mysql:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - REDIS_HOST=redis
+      SPRING_PROFILES_ACTIVE: dev
+      REDIS_HOST: redis
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: careridedb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   redis:
     image: redis:7.2
@@ -17,3 +27,27 @@ services:
     ports:
       - "6379:6379"
     restart: always
+
+  mysql:
+    image: mysql:8.0.33
+    container_name: careridemysql
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: careridedb
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=128M
+    volumes:
+      - test-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      retries: 10
+      timeout: 5s
+
+volumes:
+  test-mysql-data:
