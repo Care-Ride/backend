@@ -33,8 +33,14 @@ public enum ErrorType {
     // Connection
     INVALID_CONNECTION_CODE(HttpStatus.BAD_REQUEST, "CONNECT-400", "연동코드가 올바르지 않거나 만료되었습니다."),
     ALREADY_LINKED(HttpStatus.CONFLICT, "CONNECT-401", "이미 연결된 관계입니다."),
-    CONNECTION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-402", "연동코드를 찾을 수 없습니다.");
+    CONNECTION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-402", "연동코드를 찾을 수 없습니다."),
 
+    // driving
+    KAKAO_MAP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO-500", "카카오 지도 API 호출 중 오류가 발생했습니다."),
+    KMA_WEATHER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KMA-500", "기상청 API 호출 중 오류가 발생했습니다."),
+    DRIVE_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "DRIVE-401", "이미 운전이 종료가 된 세션입니다."),
+    DRIVE_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "DRIVE-404", "운전세션을 찾을 수 없습니다."),
+    DRIVE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "DRIVE-406", "해당 운전세션에 접근 권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
