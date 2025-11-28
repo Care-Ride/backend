@@ -9,7 +9,7 @@ import backend.knowhow.domain.test.dto.TokenResponse;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.common.response.ErrorType;
-import backend.knowhow.global.config.JwtUtil;
+import backend.knowhow.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
