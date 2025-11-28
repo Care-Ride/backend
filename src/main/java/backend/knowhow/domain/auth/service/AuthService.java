@@ -8,7 +8,7 @@ import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.auth.repository.RefreshTokenRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
-import backend.knowhow.global.config.JwtUtil;
+import backend.knowhow.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

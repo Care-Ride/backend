@@ -1,4 +1,4 @@
-package backend.knowhow.global.config;
+package backend.knowhow.global.security.jwt;
 
 import backend.knowhow.domain.member.domain.Role;
 import backend.knowhow.global.common.exception.BaseException;
