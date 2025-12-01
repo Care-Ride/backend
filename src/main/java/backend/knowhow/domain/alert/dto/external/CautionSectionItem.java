@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -32,25 +30,4 @@ public class CautionSectionItem {
     private double revY;
 
     private String occrrncId;
-
-    public static CautionSectionItem fromMap(Map<String, Object> map) {
-        return CautionSectionItem.builder()
-                .message((String) map.get("message"))
-                .outbrkType((String) map.get("outbrkType"))
-                .priority((String) map.get("priority"))
-                .routeName((String) map.get("routeName"))
-                .routeNo((String) map.get("routeNo"))
-                .roadDrcType((String) map.get("roadDrcType"))
-                .startStdLinkId((String) map.get("startStdLinkId"))
-                .startX(Double.parseDouble((String) map.get("startX")))
-                .startY(Double.parseDouble((String) map.get("startY")))
-                .revRouteName((String) map.get("revRouteName"))
-                .revRouteNo((String) map.get("revRouteNo"))
-                .revRoadDrcType((String) map.get("revRoadDrcType"))
-                .revStdLinkId((String) map.get("revStdLinkId"))
-                .revX(Double.parseDouble((String) map.get("revX")))
-                .revY(Double.parseDouble((String) map.get("revY")))
-                .occrrncId((String) map.get("occrrncId"))
-                .build();
-    }
 }

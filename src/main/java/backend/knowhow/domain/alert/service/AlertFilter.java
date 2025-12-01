@@ -1,7 +1,6 @@
 package backend.knowhow.domain.alert.service;
 
 import backend.knowhow.domain.alert.dto.internal.AlertItem;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
