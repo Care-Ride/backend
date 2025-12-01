@@ -1,7 +1,7 @@
-package backend.knowhow.domain.traffic.controller;
+package backend.knowhow.domain.location.controller;
 
-import backend.knowhow.domain.traffic.dto.LocationMessage;
-import backend.knowhow.domain.traffic.repository.LocationStore;
+import backend.knowhow.domain.location.dto.LocationMessage;
+import backend.knowhow.domain.location.repository.LocationStore;
 import backend.knowhow.global.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,6 @@ public class LocationController {
 
     @MessageMapping("/location/update")
     public void updateLocation(LocationMessage message, MemberPrincipal principal) {
-        locationStore.updateUserLocation(principal.getId(), message.getLat(), message.getLon());
+        locationStore.updateUserLocation(principal.getId(), message);
     }
 }
