@@ -17,10 +17,6 @@ public class LocationStore {
         store.put(userId, Location.from(locationMessage));
     }
 
-    public Location getLocation(Long userId) {
-        return store.get(userId);
-    }
-
     public Map<Long, Location> getAllLocations() {
         return Map.copyOf(store);
     }

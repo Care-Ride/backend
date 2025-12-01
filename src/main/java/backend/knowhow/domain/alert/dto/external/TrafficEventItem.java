@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -25,20 +23,4 @@ public class TrafficEventItem {
     private String lanesBlocked;
     private String message;
 
-    public static TrafficEventItem fromMap(Map<String, Object> map) {
-        return new TrafficEventItem(
-                (String) map.get("type"),
-                (String) map.get("eventType"),
-                (String) map.get("eventDetailType"),
-                (String) map.get("startDate"),
-                Double.parseDouble((String) map.get("coordY")),
-                Double.parseDouble((String) map.get("coordX")),
-                (String) map.get("linkId"),
-                (String) map.get("roadName"),
-                (String) map.get("roadNo"),
-                (String) map.get("roadDrcType"),
-                (String) map.get("lanesBlocked"),
-                (String) map.get("message")
-        );
-    }
 }
