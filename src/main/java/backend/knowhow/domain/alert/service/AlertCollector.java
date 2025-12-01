@@ -24,26 +24,31 @@ public class AlertCollector {
 
     public List<AlertItem> collect(double lat, double lon, double rangeKm) {
 
-        double d = rangeKm / 111.0;
-        double minX = lon - d;
-        double maxX = lon + d;
-        double minY = lat - d;
-        double maxY = lat + d;
+        try {
+            double d = rangeKm / 111.0;
+            double minX = lon - d;
+            double maxX = lon + d;
+            double minY = lat - d;
+            double maxY = lat + d;
 
-        // 1) 돌발상황
-        var trafficEvents = trafficEventApiClient.fetchEvents(minX, maxX, minY, maxY);
-        var eventAlerts = trafficEventMapper.toAlerts(trafficEvents, lat, lon);
+            // 1) 돌발상황
+            var trafficEvents = trafficEventApiClient.fetchEvents(minX, maxX, minY, maxY);
+            var eventAlerts = trafficEventMapper.toAlerts(trafficEvents, lat, lon);
 
-        // 2) 주의운전구간
-        var cautionSections = cautionSectionApiClient.fetchCautionSections(minX, maxX, minY, maxY);
-        var cautionAlerts = cautionSectionMapper.toAlerts(cautionSections, lat, lon);
+            // 2) 주의운전구간
+            var cautionSections = cautionSectionApiClient.fetchCautionSections(minX, maxX, minY, maxY);
+            var cautionAlerts = cautionSectionMapper.toAlerts(cautionSections, lat, lon);
 
-        log.info("Collected events={}, cautions={}", eventAlerts.size(), cautionAlerts.size());
+            log.info("Collected events={}, cautions={}",
+                    eventAlerts.size(), cautionAlerts.size());
 
+            List<AlertItem> combined = new java.util.ArrayList<>(eventAlerts);
+            combined.addAll(cautionAlerts);
+            return combined;
 
-        return new java.util.ArrayList<>() {{
-            addAll(eventAlerts);
-            addAll(cautionAlerts);
-        }};
+        } catch (Exception e) {
+            log.error("[AlertCollector] Unexpected exception while collecting alerts", e);
+            return List.of();
+        }
     }
 }

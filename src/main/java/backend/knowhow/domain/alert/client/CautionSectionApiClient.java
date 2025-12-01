@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -30,13 +31,22 @@ public class CautionSectionApiClient {
                 baseUrl, apiKey, minX, maxX, minY, maxY
         );
 
-        CautionSectionResponse response = restTemplate.getForObject(url, CautionSectionResponse.class);
+        try {
+            CautionSectionResponse response =
+                    restTemplate.getForObject(url, CautionSectionResponse.class);
 
-        if (response == null || response.getBody() == null) {
+            if (response == null || response.getBody() == null) {
+                log.warn("[ItsApiClient] Empty response from caution section API");
+                return List.of();
+            }
+
+            List<CautionSectionItem> items = response.getBody().getItems();
+            return items != null ? items : List.of();
+
+        } catch (RestClientException e) {
+            log.error("[ItsApiClient] Failed to fetch caution sections: minX={}, maxX={}, minY={}, maxY={}",
+                    minX, maxX, minY, maxY, e);
             return List.of();
         }
-
-        List<CautionSectionItem> items = response.getBody().getItems();
-        return items != null ? items : List.of();
     }
 }
