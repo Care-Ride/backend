@@ -38,7 +38,7 @@ public class AlertScheduler {
 
             // 2) 필터
             var filtered = filter.filter(alerts);
-            log.info("🔍 All locations: {}", filtered);
+            log.info("🔍 Filtered alerts for userId={}: {}", userId, filtered);
 
             if (!filtered.isEmpty()) {
                 alertService.sendAlerts(userId, filtered);

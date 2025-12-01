@@ -6,6 +6,6 @@ public record LocationMessage (
     double lon,
     double speed,
     double heading,
-    Long timestamp
+    long timestamp
 ){
 }
