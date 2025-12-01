@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TrafficEventApiClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${traffic.api.key}")
     private String apiKey;
