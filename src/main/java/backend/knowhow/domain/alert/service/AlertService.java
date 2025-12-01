@@ -17,10 +17,18 @@ import java.util.List;
 public class AlertService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final AlertHistoryStore alertHistoryStore;
 
     public void sendAlerts(Long userId, List<AlertItem> alerts) {
 
         for (AlertItem alert : alerts) {
+
+            // 메시지 중복 방지
+            if (!alertHistoryStore.shouldSend(userId, alert.getMessage())) {
+                log.info("Skip duplicate alert for user={} msg={}", userId, alert.getMessage());
+                continue;
+            }
+
             messagingTemplate.convertAndSendToUser(
                     userId.toString(),
                     "/sub/traffic",
