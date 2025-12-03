@@ -53,6 +53,9 @@ dependencies {
 	// WebSocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+	// Apache HttpClient
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
+
 
 }
 jar {
