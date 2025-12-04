@@ -42,6 +42,10 @@ public class AuthService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
+        if (role == Role.ADMIN) {
+            throw new BaseException(ErrorType.INVALID_ROLE);
+        }
+
         member.setRole(role);
         memberRepository.save(member);
 

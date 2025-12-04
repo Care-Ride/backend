@@ -17,6 +17,7 @@ public enum ErrorType {
 
     // Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-404", "회원을 찾을 수 없습니다."),
+    INVALID_ROLE(HttpStatus.BAD_REQUEST, "MEMBER-405", "유효하지 않은 역할입니다."),
 
     // JWT
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-401", "유효하지 않은 토큰입니다."),
