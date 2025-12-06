@@ -29,6 +29,12 @@ public class KoroadHotspotGeometryCache {
 
     @PostConstruct
     public void loadFromDb() {
+        reloadCache();
+    }
+
+    public synchronized void reloadCache() {
+        hotspots.clear();
+
         List<KoroadHotspot> all = hotspotRepository.findAll();
         int success = 0;
 

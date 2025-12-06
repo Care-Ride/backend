@@ -25,6 +25,11 @@ public class KoroadHotspotSyncService {
         // Koroad에서 신규 데이터 가져오기
         List<KoroadBaseResponse.Item> items = koroadApiClient.fetchHotspots(apiType, siDo, guGun);
 
+        if (items.isEmpty()) {
+            log.warn("[KoroadHotspotSyncService] No items fetched. Skipping sync for type={}, siDo={}, guGun={}", type, siDo, guGun);
+            return;
+        }
+
         // 기존 데이터 삭제 (같은 type + region 기준)
         hotspotRepository.deleteByTypeAndSiDoAndGuGun(type, siDo, guGun);
 
