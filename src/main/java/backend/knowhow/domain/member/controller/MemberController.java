@@ -12,6 +12,7 @@ import backend.knowhow.domain.member.service.MemberService;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
 import backend.knowhow.global.security.MemberPrincipal;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class MemberController {
     @PostMapping("/device-setting")
     public DeviceSettingResponse saveOrUpdateSetting(
             @CurrentUser MemberPrincipal member,
-            @RequestBody DeviceSettingRequest request
+            @Valid @RequestBody DeviceSettingRequest request
     ) {
         return settingService.saveOrUpdateSetting(member.getId(), request);
     }
