@@ -34,8 +34,8 @@ public class MemberDeviceSettingService {
                         MemberDeviceSetting.builder()
                                 .member(member)
                                 .deviceId(request.deviceId())
-                                .volumeLevel(request.volumeLevel())
-                                .fontLevel(request.fontLevel())
+                                .volumeLevel(volumeLevel)
+                                .fontLevel(fontLevel)
                                 .build()
                 );
 
