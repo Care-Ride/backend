@@ -57,11 +57,8 @@ public class KoroadApiClient {
                 + "&numOfRows=9999"
                 + "&pageNo=1";
 
-        log.info("url : {}", url);
-
         try {
             KoroadBaseResponse res = restTemplate.getForObject(url, KoroadBaseResponse.class);
-            log.info("Aaaa");
             if (res == null) {
                 log.warn("[KoroadApiClient] Null response. url={}", url);
                 return Collections.emptyList();
