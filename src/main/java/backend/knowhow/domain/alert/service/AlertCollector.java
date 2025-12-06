@@ -21,6 +21,7 @@ public class AlertCollector {
 
     private final CautionSectionApiClient cautionSectionApiClient;
     private final CautionSectionMapper cautionSectionMapper;
+    private final KoroadAlertCollector koroadAlertCollector;
 
     public List<AlertItem> collect(double lat, double lon, double rangeKm) {
 
@@ -39,11 +40,15 @@ public class AlertCollector {
             var cautionSections = cautionSectionApiClient.fetchCautionSections(minX, maxX, minY, maxY);
             var cautionAlerts = cautionSectionMapper.toAlerts(cautionSections, lat, lon);
 
+            // 3) Koroad 사고다발지역
+            var koroadAlerts = koroadAlertCollector.collect(lat, lon, rangeKm);
+
             log.info("Collected events={}, cautions={}",
                     eventAlerts.size(), cautionAlerts.size());
 
             List<AlertItem> combined = new java.util.ArrayList<>(eventAlerts);
             combined.addAll(cautionAlerts);
+            combined.addAll(koroadAlerts);
             return combined;
 
         } catch (Exception e) {

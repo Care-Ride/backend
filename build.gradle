@@ -56,7 +56,9 @@ dependencies {
 	// Apache HttpClient
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
 
-
+	// JTS (Geo)
+	implementation 'org.locationtech.jts:jts-core:1.19.0'
+	implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
 }
 jar {
 	enabled = false
