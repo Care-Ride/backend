@@ -29,11 +29,10 @@ public class MemberDeviceSettingService {
 
         // 설정이 없으면 새로 생성
         MemberDeviceSetting setting = settingRepository
-                .findByMemberAndDeviceId(member, request.deviceId())
+                .findByMember(member)
                 .orElseGet(() ->
                         MemberDeviceSetting.builder()
                                 .member(member)
-                                .deviceId(request.deviceId())
                                 .volumeLevel(volumeLevel)
                                 .fontLevel(fontLevel)
                                 .build()
@@ -50,13 +49,13 @@ public class MemberDeviceSettingService {
 
     // 세팅 조회
     @Transactional(readOnly = true)
-    public DeviceSettingResponse getSetting(Long memberId, String deviceId) {
+    public DeviceSettingResponse getSetting(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
-        return settingRepository.findByMemberAndDeviceId(member, deviceId)
+        return settingRepository.findByMember(member)
                 .map(setting -> DeviceSettingResponse.from(setting))
                 // DB에 없으면 기본값(2,2)로 응답 (DB에 저장은 안 함)
-                .orElseGet(() -> DeviceSettingResponse.from(deviceId, 2, 2));
+                .orElseGet(() -> DeviceSettingResponse.from(2, 2));
     }
 }

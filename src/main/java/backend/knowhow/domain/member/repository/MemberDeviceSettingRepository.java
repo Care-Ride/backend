@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface MemberDeviceSettingRepository extends JpaRepository<MemberDeviceSetting, Long> {
 
-    Optional<MemberDeviceSetting> findByMemberAndDeviceId(Member member, String deviceId);
+    Optional<MemberDeviceSetting> findByMember(Member member);
 }
