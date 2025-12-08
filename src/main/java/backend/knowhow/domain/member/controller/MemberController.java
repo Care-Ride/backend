@@ -64,12 +64,11 @@ public class MemberController {
         return settingService.saveOrUpdateSetting(member.getId(), request);
     }
 
-    @GetMapping("/device-setting/{deviceId}")
+    @GetMapping("/device-setting")
     public DeviceSettingResponse getSetting(
-            @CurrentUser MemberPrincipal member,
-            @PathVariable String deviceId
+            @CurrentUser MemberPrincipal member
     ) {
-        return settingService.getSetting(member.getId(), deviceId);
+        return settingService.getSetting(member.getId());
     }
 
 }

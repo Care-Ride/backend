@@ -2,20 +2,15 @@ package backend.knowhow.domain.member.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Table(
-        name = "member_device_setting",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_member_device",
-                        columnNames = {"member_id", "device_id"}
-                )
-        }
-)
+@Table(name = "member_device_setting")
+@NoArgsConstructor(access = PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class MemberDeviceSetting {
 
     @Id
@@ -25,10 +20,6 @@ public class MemberDeviceSetting {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-
-    // 기기 식별자 (디바이스 ID, FCM token, UUID 등)
-    @Column(name = "device_id", nullable = false, length = 100)
-    private String deviceId;
 
     // 글자 크기 (1~3), 기본 2
     @Column(name = "font_level", nullable = false)
@@ -41,7 +32,6 @@ public class MemberDeviceSetting {
     @Builder
     public MemberDeviceSetting(Member member, String deviceId, int fontLevel, int volumeLevel){
         this.member = member;
-        this.deviceId = deviceId;
         this.fontLevel = fontLevel;
         this.volumeLevel = volumeLevel;
     }
