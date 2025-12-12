@@ -36,6 +36,7 @@ public enum ErrorType {
     ALREADY_LINKED(HttpStatus.CONFLICT, "CONNECT-401", "이미 연결된 관계입니다."),
     CONNECTION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-402", "연동코드를 찾을 수 없습니다."),
     LINK_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-403", "연결 정보를 찾을 수 없습니다."),
+    LINK_INFO_INVALID(HttpStatus.BAD_REQUEST, "LINK-400", "관계 설정 정보가 올바르지 않습니다."),
 
     // driving
     KAKAO_MAP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO-500", "카카오 지도 API 호출 중 오류가 발생했습니다."),
