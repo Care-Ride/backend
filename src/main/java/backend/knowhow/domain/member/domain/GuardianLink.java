@@ -24,9 +24,21 @@ public class GuardianLink {
     @JoinColumn(name = "senior_id", nullable = false)
     private Member senior;
 
+    // 보호자가 설정한 관계
+    @Enumerated(EnumType.STRING)
+    private RelationType relationType;
+
+    // 보호자가 입력한 고령자 이름
+    private String customSeniorName;
+
     public GuardianLink(Member guardian, Member senior) {
         this.guardian = guardian;
         this.senior = senior;
+    }
+
+    public void updateInfo(RelationType relationType, String customSeniorName) {
+        this.relationType = relationType;
+        this.customSeniorName = customSeniorName;
     }
 
 }
