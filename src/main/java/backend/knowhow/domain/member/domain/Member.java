@@ -35,6 +35,4 @@ public class Member {
         this.nickname = nickname;
         this.role = role;
     }
-
-
 }
