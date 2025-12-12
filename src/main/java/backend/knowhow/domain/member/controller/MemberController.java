@@ -78,7 +78,7 @@ public class MemberController {
     @PatchMapping("/link/info")
     public ApiResponse<Void> updateMyLinkInfo(
             @CurrentUser MemberPrincipal guardian,
-            @RequestBody LinkInfoRequest request
+            @Valid @RequestBody LinkInfoRequest request
     ) {
         guardianLinkService.updatePendingLink(
                 guardian.getId(),

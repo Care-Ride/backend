@@ -9,9 +9,10 @@ import backend.knowhow.domain.member.repository.GuardianLinkRepository;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,19 @@ public class GuardianLinkService {
             RelationType relationType,
             String customSeniorName
     ) {
+
+        if (relationType == null) {
+            throw new BaseException(ErrorType.LINK_INFO_INVALID);
+        }
+
+        if (relationType == RelationType.CUSTOM && !StringUtils.hasText(customSeniorName)) {
+            throw new BaseException(ErrorType.LINK_INFO_INVALID);
+        }
+
+        if (relationType != RelationType.CUSTOM) {
+            customSeniorName = null;
+        }
+
         GuardianLink link = guardianLinkRepository
                 .findByGuardianIdAndRelationTypeIsNull(guardianId)
                 .orElseThrow(() -> new BaseException(ErrorType.LINK_NOT_FOUND));
@@ -72,9 +86,14 @@ public class GuardianLinkService {
                 .findBySeniorId(seniorId)
                 .orElseThrow(() -> new BaseException(ErrorType.LINK_NOT_FOUND));
 
+        RelationType reversed = null;
+        if (link.getRelationType() != null) {
+            reversed = RelationMapper.reverse(link.getRelationType());
+        }
+
         return new SeniorViewLinkResponse(
                 link.getGuardian().getNickname(),
-                RelationMapper.reverse(link.getRelationType())
+                reversed
         );
     }
 }
