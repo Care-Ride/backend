@@ -1,11 +1,13 @@
 package backend.knowhow.domain.auth.service;
 
+import backend.knowhow.domain.auth.dto.response.LoginResponse;
 import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.domain.Role;
 import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.auth.repository.RefreshTokenRepository;
+import backend.knowhow.domain.member.service.MemberDeviceSettingService;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import backend.knowhow.global.security.jwt.JwtUtil;
@@ -17,11 +19,12 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final MemberDeviceSettingService deviceSettingService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final KakaoAuthService kakaoAuthService;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse loginKakao(String accessToken) {
+    public LoginResponse loginKakao(String accessToken) {
 
         KakaoUserInfo userInfo = kakaoAuthService.getUserInfo(accessToken);
 
@@ -35,7 +38,10 @@ public class AuthService {
         String refresh = jwtUtil.createRefreshToken(member.getId());
         refreshTokenRepository.save(member.getId(), refresh);
 
-        return new AuthResponse(access, refresh);
+        // 화면 세팅 여부
+        Boolean hasDeviceSetting = deviceSettingService.existsSettingByMember(member);
+
+        return new LoginResponse(access, refresh, hasDeviceSetting);
     }
 
     public AuthResponse selectRole(Long memberId, Role role) {

@@ -58,4 +58,10 @@ public class MemberDeviceSettingService {
                 // DB에 없으면 기본값(2,2)로 응답 (DB에 저장은 안 함)
                 .orElseGet(() -> DeviceSettingResponse.from(2, 2));
     }
+
+    // 세팅 저장 유무
+    @Transactional(readOnly = true)
+    public boolean existsSettingByMember(Member member){
+        return settingRepository.existsByMember(member);
+    }
 }

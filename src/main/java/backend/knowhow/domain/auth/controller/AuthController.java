@@ -3,6 +3,7 @@ package backend.knowhow.domain.auth.controller;
 import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.request.KakaoLoginRequest;
 import backend.knowhow.domain.auth.dto.request.ReissueRequest;
+import backend.knowhow.domain.auth.dto.response.LoginResponse;
 import backend.knowhow.domain.auth.service.AuthService;
 import backend.knowhow.domain.auth.dto.request.RoleRequest;
 import backend.knowhow.global.common.response.ApiResponse;
@@ -22,9 +23,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/kakao")
-    public ApiResponse<AuthResponse> loginKakao(@RequestBody KakaoLoginRequest request) {
+    public ApiResponse<LoginResponse> loginKakao(@RequestBody KakaoLoginRequest request) {
 
-        AuthResponse response = authService.loginKakao(request.getAccessToken());
+        LoginResponse response = authService.loginKakao(request.getAccessToken());
 
         return ApiResponse.success(response);
     }

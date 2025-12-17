@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface MemberDeviceSettingRepository extends JpaRepository<MemberDeviceSetting, Long> {
 
     Optional<MemberDeviceSetting> findByMember(Member member);
+    boolean existsByMember(Member member);
 }
