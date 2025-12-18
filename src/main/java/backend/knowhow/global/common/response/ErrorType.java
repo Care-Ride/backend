@@ -38,6 +38,9 @@ public enum ErrorType {
     LINK_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-403", "연결 정보를 찾을 수 없습니다."),
     LINK_INFO_INVALID(HttpStatus.BAD_REQUEST, "LINK-400", "관계 설정 정보가 올바르지 않습니다."),
 
+    // Setting
+    INVALID_SETTING_LEVEL(HttpStatus.BAD_REQUEST, "SETTING-400", "기기설정 레벨이 올바르지 않습니다."),
+
     // driving
     KAKAO_MAP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO-500", "카카오 지도 API 호출 중 오류가 발생했습니다."),
     KMA_WEATHER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KMA-500", "기상청 API 호출 중 오류가 발생했습니다."),

@@ -1,5 +1,7 @@
 package backend.knowhow.domain.member.domain;
 
+import backend.knowhow.global.common.exception.BaseException;
+import backend.knowhow.global.common.response.ErrorType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +20,7 @@ public class MemberDeviceSetting {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
     // 글자 크기 (1~3), 기본 2
@@ -46,8 +48,8 @@ public class MemberDeviceSetting {
     }
 
     private void validateLevel(int level, String fieldName) {
-        if (level < 1 || level > 3) {
-            throw new IllegalArgumentException(fieldName + " must be between 1 and 3. input=" + level);
+        if (level < 1 || level > 5) {
+            throw new BaseException(ErrorType.INVALID_SETTING_LEVEL);
         }
     }
 }
