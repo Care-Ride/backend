@@ -20,7 +20,7 @@ public class MemberDeviceSetting {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
     // 글자 크기 (1~3), 기본 2
