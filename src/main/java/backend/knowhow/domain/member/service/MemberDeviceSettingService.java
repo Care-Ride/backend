@@ -66,4 +66,10 @@ public class MemberDeviceSettingService {
     public boolean existsSettingByMember(Member member){
         return settingRepository.existsByMember(member);
     }
+
+    // 세팅 저장 유무
+    @Transactional(readOnly = true)
+    public boolean existsSettingByMember(Member member){
+        return settingRepository.existsByMember(member);
+    }
 }

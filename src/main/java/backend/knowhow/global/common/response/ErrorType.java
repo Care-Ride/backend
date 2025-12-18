@@ -35,6 +35,8 @@ public enum ErrorType {
     INVALID_CONNECTION_CODE(HttpStatus.BAD_REQUEST, "CONNECT-400", "연동코드가 올바르지 않거나 만료되었습니다."),
     ALREADY_LINKED(HttpStatus.CONFLICT, "CONNECT-401", "이미 연결된 관계입니다."),
     CONNECTION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-402", "연동코드를 찾을 수 없습니다."),
+    LINK_NOT_FOUND(HttpStatus.NOT_FOUND, "CONNECT-403", "연결 정보를 찾을 수 없습니다."),
+    LINK_INFO_INVALID(HttpStatus.BAD_REQUEST, "LINK-400", "관계 설정 정보가 올바르지 않습니다."),
 
     // Setting
     INVALID_SETTING_LEVEL(HttpStatus.BAD_REQUEST, "SETTING-400", "기기설정 레벨이 올바르지 않습니다."),

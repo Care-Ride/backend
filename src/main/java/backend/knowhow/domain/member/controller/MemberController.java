@@ -2,9 +2,12 @@ package backend.knowhow.domain.member.controller;
 
 import backend.knowhow.domain.member.dto.request.ConnectRequest;
 import backend.knowhow.domain.member.dto.request.DeviceSettingRequest;
+import backend.knowhow.domain.member.dto.request.LinkInfoRequest;
 import backend.knowhow.domain.member.dto.response.ConnectionCodeResponse;
 import backend.knowhow.domain.member.dto.response.DeviceSettingResponse;
+import backend.knowhow.domain.member.dto.response.GuardianViewLinkResponse;
 import backend.knowhow.domain.member.dto.response.MemberInfoResponse;
+import backend.knowhow.domain.member.dto.response.SeniorViewLinkResponse;
 import backend.knowhow.domain.member.service.ConnectionCodeService;
 import backend.knowhow.domain.member.service.GuardianLinkService;
 import backend.knowhow.domain.member.service.MemberDeviceSettingService;
@@ -69,6 +72,42 @@ public class MemberController {
             @CurrentUser MemberPrincipal member
     ) {
         return settingService.getSetting(member.getId());
+    }
+
+    @PreAuthorize("hasRole('GUARDIAN')")
+    @PatchMapping("/link/info")
+    public ApiResponse<Void> updateMyLinkInfo(
+            @CurrentUser MemberPrincipal guardian,
+            @Valid @RequestBody LinkInfoRequest request
+    ) {
+        guardianLinkService.updatePendingLink(
+                guardian.getId(),
+                request.relationType(),
+                request.customSeniorName()
+        );
+        return ApiResponse.success();
+    }
+
+    // 보호자 화면
+    @PreAuthorize("hasRole('GUARDIAN')")
+    @GetMapping("/link/senior")
+    public ApiResponse<GuardianViewLinkResponse> getMySenior(
+            @CurrentUser MemberPrincipal guardian
+    ) {
+        return ApiResponse.success(
+                guardianLinkService.getForGuardian(guardian.getId())
+        );
+    }
+
+    // 고령자 화면
+    @PreAuthorize("hasRole('SENIOR')")
+    @GetMapping("/link/guardian")
+    public ApiResponse<SeniorViewLinkResponse> getMyGuardian(
+            @CurrentUser MemberPrincipal senior
+    ) {
+        return ApiResponse.success(
+                guardianLinkService.getForSenior(senior.getId())
+        );
     }
 
 }
