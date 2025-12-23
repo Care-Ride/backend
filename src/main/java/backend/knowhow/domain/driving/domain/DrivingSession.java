@@ -41,9 +41,6 @@ public class DrivingSession {
     @ColumnDefault("0")
     private int hardDecelCount;    // 급감속 횟수
 
-    @ColumnDefault("0")
-    private int suddenStopCount;    // 급제동 횟수
-
     private int score;    // 운전 점수
 
     // TODO: 논의 후 String 주소로 넣을 수도 있음.
@@ -75,7 +72,6 @@ public class DrivingSession {
     public void finish(double totalDistance,
                        int hardAccelCount,
                        int hardDecelCount,
-                       int suddenStopCount,
                        double endLat,
                        double endLon,
                        int score) {
@@ -83,7 +79,6 @@ public class DrivingSession {
         this.distance = totalDistance;
         this.hardAccelCount = hardAccelCount;
         this.hardDecelCount = hardDecelCount;
-        this.suddenStopCount = suddenStopCount;
         this.endLat = endLat;
         this.endLon = endLon;
         this.score = score;

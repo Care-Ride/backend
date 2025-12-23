@@ -100,7 +100,7 @@ public class DrivingService {
             throw new BaseException(ErrorType.DRIVE_ALREADY_ENDED);
         }
 
-        driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(), request.getSuddenStopCount(),
+        driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(),
                 request.getLat(), request.getLon(), request.getScore());
 
         return DrivingSessionSummary.from(driveSession);

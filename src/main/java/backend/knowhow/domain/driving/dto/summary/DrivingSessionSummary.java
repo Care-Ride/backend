@@ -22,7 +22,6 @@ public class DrivingSessionSummary {
     private Double distance;        // 주행거리
     private int hardAccelCount;     // 급가속 횟수
     private int hardDecelCount;     // 급감속 횟수
-    private int suddenStopCount;    // 급제동 횟수
     private int score;              // 운전 점수
 
     private double startLat;
@@ -39,7 +38,6 @@ public class DrivingSessionSummary {
                 .distance(drive.getDistance())
                 .hardAccelCount(drive.getHardAccelCount())
                 .hardDecelCount(drive.getHardDecelCount())
-                .suddenStopCount(drive.getSuddenStopCount())
                 .score(drive.getScore())
                 .startLat(drive.getStartLat())
                 .startLon(drive.getStartLon())
