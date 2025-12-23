@@ -14,4 +14,13 @@ public interface GuardianLinkRepository extends JpaRepository<GuardianLink, Long
 
     Optional<GuardianLink> findByGuardianId(Long guardianId);
     Optional<GuardianLink> findBySeniorId(Long seniorId);
+
+    void deleteByGuardianId(Long guardianId);
+
+    void deleteBySeniorId(Long seniorId);
+
+    default void deleteByGuardianIdOrSeniorId(Long memberId) {
+        deleteByGuardianId(memberId);
+        deleteBySeniorId(memberId);
+    }
 }
