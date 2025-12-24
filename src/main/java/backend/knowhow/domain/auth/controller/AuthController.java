@@ -49,5 +49,11 @@ public class AuthController {
         return ApiResponse.success();
     }
 
+    @PostMapping("/withdraw")
+    public ApiResponse<Void> withdraw(@CurrentUser MemberPrincipal member) {
+        authService.withdraw(member.getId());
+        return ApiResponse.success();
+    }
+
 
 }

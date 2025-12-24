@@ -1,10 +1,13 @@
 package backend.knowhow.domain.auth.service;
 
 import backend.knowhow.domain.auth.dto.response.LoginResponse;
+import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
 import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.domain.Role;
 import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
+import backend.knowhow.domain.member.repository.GuardianLinkRepository;
+import backend.knowhow.domain.member.repository.MemberDeviceSettingRepository;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.auth.repository.RefreshTokenRepository;
 import backend.knowhow.domain.member.service.MemberDeviceSettingService;
@@ -13,6 +16,7 @@ import backend.knowhow.global.common.response.ErrorType;
 import backend.knowhow.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,9 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final MemberDeviceSettingService deviceSettingService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final GuardianLinkRepository guardianLinkRepository;
+    private final DrivingSessionRepository drivingSessionRepository;
+    private final MemberDeviceSettingRepository memberDeviceSettingRepository;
     private final KakaoAuthService kakaoAuthService;
     private final JwtUtil jwtUtil;
 
@@ -82,5 +89,18 @@ public class AuthService {
 
     public void logout(Long memberId) {
         refreshTokenRepository.delete(memberId);
+    }
+
+    @Transactional
+    public void withdraw(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        refreshTokenRepository.delete(memberId);
+        guardianLinkRepository.deleteByGuardianIdOrSeniorId(memberId);
+        drivingSessionRepository.deleteByDriver_Id(memberId);
+        memberDeviceSettingRepository.deleteByMemberId(memberId);
+        memberRepository.delete(member);
     }
 }

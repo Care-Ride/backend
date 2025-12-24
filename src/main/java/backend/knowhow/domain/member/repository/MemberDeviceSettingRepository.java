@@ -10,4 +10,5 @@ public interface MemberDeviceSettingRepository extends JpaRepository<MemberDevic
 
     Optional<MemberDeviceSetting> findByMember(Member member);
     boolean existsByMember(Member member);
+    void deleteByMemberId(Long memberId);
 }

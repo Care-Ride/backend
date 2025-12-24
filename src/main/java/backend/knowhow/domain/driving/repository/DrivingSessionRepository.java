@@ -12,4 +12,6 @@ public interface DrivingSessionRepository extends JpaRepository<DrivingSession, 
             LocalDateTime start,
             LocalDateTime end
     );
+  
+    void deleteByDriver_Id(Long memberId);
 }
