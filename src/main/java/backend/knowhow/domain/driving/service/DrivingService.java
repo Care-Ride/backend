@@ -5,6 +5,7 @@ import backend.knowhow.domain.driving.domain.WeatherCondition;
 import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
 import backend.knowhow.domain.driving.dto.request.LocationRequest;
 import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
+import backend.knowhow.domain.driving.dto.response.DailyDrivingListResponse;
 import backend.knowhow.domain.driving.dto.response.DriveStartResponse;
 import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
 import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
@@ -23,8 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,9 +103,21 @@ public class DrivingService {
             throw new BaseException(ErrorType.DRIVE_ALREADY_ENDED);
         }
 
-        driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(), request.getSuddenStopCount(),
+        driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(),
                 request.getLat(), request.getLon(), request.getScore());
 
         return DrivingSessionSummary.from(driveSession);
+    }
+
+    @Transactional(readOnly = true)
+    public DailyDrivingListResponse getDailyDrivingRecords(LocalDate date, Long memberId) {
+        Member driver = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetween(driver.getId(), date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+        List<DrivingSessionSummary> dtoList = drivingList.stream()
+                .map(DrivingSessionSummary::from)
+                .collect(Collectors.toList());
+
+        return new DailyDrivingListResponse(dtoList, date);
     }
 }
