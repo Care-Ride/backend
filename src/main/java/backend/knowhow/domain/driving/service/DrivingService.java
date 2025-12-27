@@ -161,8 +161,13 @@ public class DrivingService {
 
     // 운전 종료 시 급가속, 급감속 기반 점수 산정
     private int calculateDrivingScore(int hardAccel, int hardDecel, double distance){
+        if(distance == 0) return 0;
+
         double ratePer100km = (hardAccel + hardDecel) / distance * 100.0;
-        return (int) Math.round(100-ratePer100km);
+        int score = (int) Math.round(100 - ratePer100km);
+
+        if(score < 0) return 0;
+        return score;
     }
 
     // 급가속, 급가속 월별 점수 계산
