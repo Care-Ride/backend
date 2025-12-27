@@ -104,8 +104,10 @@ public class DrivingService {
             throw new BaseException(ErrorType.DRIVE_ALREADY_ENDED);
         }
 
+        int driveScore = calculateDrivingScore(request.getHardAccelCount(), request.getHardDecelCount(), request.getTotalDistance());
+
         driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(),
-                request.getLat(), request.getLon(), request.getScore());
+                request.getLat(), request.getLon(), driveScore);
 
         return DrivingSessionSummary.from(driveSession);
     }
@@ -156,6 +158,13 @@ public class DrivingService {
 
     }
 
+    // 운전 종료 시 급가속, 급감속 기반 점수 산정
+    private int calculateDrivingScore(int hardAccel, int hardDecel, double distance){
+        double ratePer100km = (hardAccel + hardDecel) / distance * 100.0;
+        return (int) Math.round(100-ratePer100km);
+    }
+
+    // 급가속, 급가속 월별 점수 계산
     private int drivingEventStarCalculator(int eventCount, double totalDistance){
         if(totalDistance <= 0.0) return 0;
 
