@@ -147,6 +147,7 @@ public class DrivingService {
         double avgDrivingScore = drivingList.stream()
                 .filter(Objects::nonNull)
                 .mapToInt(DrivingSession::getScore).average().orElse(0.0);
+        avgDrivingScore = Math.round(avgDrivingScore * 10) / 10.0;  // 소숫점 한자리까지
 
         double totalDistance = drivingList.stream()
                 .filter(Objects::nonNull)
