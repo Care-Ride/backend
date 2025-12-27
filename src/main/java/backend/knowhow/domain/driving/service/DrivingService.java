@@ -21,10 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
@@ -43,6 +42,7 @@ public class DrivingService {
 
     private static final LocalTime NIGHT_START = LocalTime.of(20, 0);   // 20:00
     private static final LocalTime NIGHT_END = LocalTime.of(6, 0);  // 6:00
+    private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Transactional(readOnly = true)
     public BeforeDriveDangerResponse getDangerBeforeDrive(LocationRequest request) {
@@ -127,7 +127,12 @@ public class DrivingService {
         Member driver = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
-        YearMonth month = YearMonth.parse(yearMonth);
+        YearMonth month;
+        try{
+            month = YearMonth.parse(yearMonth, YEAR_MONTH_FORMATTER);
+        } catch (DateTimeParseException e){
+            throw new BaseException(ErrorType.INVALID_DATE_FORMAT);
+        }
         LocalDateTime startTime = month.atDay(1).atStartOfDay();
         LocalDateTime endTime = month.plusMonths(1).atDay(1).atStartOfDay();    //다음달 1일 00:00
 
