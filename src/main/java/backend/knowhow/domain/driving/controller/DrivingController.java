@@ -2,10 +2,7 @@ package backend.knowhow.domain.driving.controller;
 
 import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
 import backend.knowhow.domain.driving.dto.request.LocationRequest;
-import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
-import backend.knowhow.domain.driving.dto.response.DailyDrivingListResponse;
-import backend.knowhow.domain.driving.dto.response.DriveStartResponse;
-import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
+import backend.knowhow.domain.driving.dto.response.*;
 import backend.knowhow.domain.driving.dto.summary.DrivingSessionSummary;
 import backend.knowhow.domain.driving.service.DrivingService;
 import backend.knowhow.global.common.response.ApiResponse;
@@ -64,6 +61,16 @@ public class DrivingController {
             @CurrentUser MemberPrincipal user
     ){
         DailyDrivingListResponse response = drivingService.getDailyDrivingRecords(date, user.getId());
+        return ApiResponse.success(response);
+    }
+
+    // 월별 운전 기록 조회
+    @GetMapping("/monthly/{yearMonth}")
+    public ApiResponse<MonthlyDriveResponse> getMonthlyDrivingRecords(
+            @PathVariable String yearMonth,
+            @CurrentUser MemberPrincipal user
+    ){
+        MonthlyDriveResponse response = drivingService.getMonthlyDrivingRecords(yearMonth, user.getId());
         return ApiResponse.success(response);
     }
 }

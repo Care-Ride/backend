@@ -4,11 +4,8 @@ import backend.knowhow.domain.driving.domain.DrivingSession;
 import backend.knowhow.domain.driving.domain.WeatherCondition;
 import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
 import backend.knowhow.domain.driving.dto.request.LocationRequest;
-import backend.knowhow.domain.driving.dto.response.BeforeDriveDangerResponse;
-import backend.knowhow.domain.driving.dto.response.DailyDrivingListResponse;
-import backend.knowhow.domain.driving.dto.response.DriveStartResponse;
+import backend.knowhow.domain.driving.dto.response.*;
 import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
-import backend.knowhow.domain.driving.dto.response.PlaceSearchListResponse;
 import backend.knowhow.domain.driving.dto.response.kakao.KakaoPlaceSearchResponse;
 import backend.knowhow.domain.driving.dto.summary.DrivingSessionSummary;
 import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
@@ -25,8 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,5 +120,46 @@ public class DrivingService {
                 .collect(Collectors.toList());
 
         return new DailyDrivingListResponse(dtoList, date);
+    }
+
+    @Transactional(readOnly = true)
+    public MonthlyDriveResponse getMonthlyDrivingRecords(String yearMonth, Long memberId) {
+        Member driver = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        YearMonth month = YearMonth.parse(yearMonth);
+        LocalDateTime startTime = month.atDay(1).atStartOfDay();
+        LocalDateTime endTime = month.plusMonths(1).atDay(1).atStartOfDay();    //다음달 1일 00:00
+
+        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetween(driver.getId(), startTime, endTime);
+
+        int hardAccelSum = drivingList.stream().mapToInt(DrivingSession::getHardAccelCount).sum();
+        int hardDecelSum = drivingList.stream().mapToInt(DrivingSession::getHardDecelCount).sum();
+
+        double avgDrivingScore = drivingList.stream()
+                .filter(Objects::nonNull)
+                .mapToInt(DrivingSession::getScore).average().orElse(0.0);
+
+        double totalDistance = drivingList.stream()
+                .filter(Objects::nonNull)
+                .mapToDouble(DrivingSession::getDistance).sum();
+
+        int hardAccelStar = drivingEventStarCalculator(hardAccelSum, totalDistance);
+        int hardDecelStar = drivingEventStarCalculator(hardDecelSum, totalDistance);
+
+        return new MonthlyDriveResponse(month.getMonthValue(), avgDrivingScore, hardAccelStar, hardDecelStar);
+
+    }
+
+    private int drivingEventStarCalculator(int eventCount, double totalDistance){
+        if(totalDistance <= 0.0) return 0;
+
+        double ratePer100km = (eventCount / totalDistance) * 100.0; // 100km당 event 발생 비율
+
+        if(ratePer100km <= 2.0) return 5;
+        else if(ratePer100km <= 5.0) return 4;
+        else if(ratePer100km <= 9.0) return 3;
+        else if(ratePer100km <= 14.0) return 2;
+        else return 1;
     }
 }
