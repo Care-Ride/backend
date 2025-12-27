@@ -14,7 +14,12 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@Table(name = "driving_session")
+@Table(
+        name = "driving_session",
+        indexes = {
+                @Index(name = "idx_driving_session_member_start_time", columnList = "member_id, start_time")
+        }
+)
 @NoArgsConstructor(access = PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class DrivingSession {
