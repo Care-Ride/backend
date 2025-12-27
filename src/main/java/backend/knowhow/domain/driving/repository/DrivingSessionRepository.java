@@ -12,6 +12,12 @@ public interface DrivingSessionRepository extends JpaRepository<DrivingSession, 
             LocalDateTime start,
             LocalDateTime end
     );
-  
+
+    List<DrivingSession> findAllByDriverIdAndStartTimeBetweenAndEndTimeIsNotNull(
+            Long driverId,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    );
+
     void deleteByDriver_Id(Long memberId);
 }

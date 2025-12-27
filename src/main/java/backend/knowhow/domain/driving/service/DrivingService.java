@@ -138,7 +138,8 @@ public class DrivingService {
         LocalDateTime startTime = month.atDay(1).atStartOfDay();
         LocalDateTime endTime = month.plusMonths(1).atDay(1).atStartOfDay();    //다음달 1일 00:00
 
-        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetween(driver.getId(), startTime, endTime);
+        // 운전 완료되지 않은 경우 제외한 운전 목록
+        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetweenAndEndTimeIsNotNull(driver.getId(), startTime, endTime);
 
         int hardAccelSum = drivingList.stream().mapToInt(DrivingSession::getHardAccelCount).sum();
         int hardDecelSum = drivingList.stream().mapToInt(DrivingSession::getHardDecelCount).sum();
@@ -155,7 +156,6 @@ public class DrivingService {
         int hardDecelStar = drivingEventStarCalculator(hardDecelSum, totalDistance);
 
         return new MonthlyDriveResponse(month.getMonthValue(), avgDrivingScore, hardAccelStar, hardDecelStar);
-
     }
 
     // 운전 종료 시 급가속, 급감속 기반 점수 산정
