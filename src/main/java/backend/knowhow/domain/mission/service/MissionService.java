@@ -9,6 +9,7 @@ import backend.knowhow.domain.mission.repository.MissionRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +50,16 @@ public class MissionService {
                 .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
 
         MemberMission memberMission = memberMissionRepository.findByMemberAndMission(member, mission)
-                .orElseGet(() -> memberMissionRepository.save(MemberMission.createNew(member, mission)));
+                .orElseGet(() -> {
+                    try {
+                        return memberMissionRepository.save(
+                                MemberMission.createNew(member, mission)
+                        );
+                    } catch (DataIntegrityViolationException e) {
+                        return memberMissionRepository.findByMemberAndMission(member, mission)
+                                .orElseThrow(() -> new BaseException(ErrorType.INTERNAL_SERVER_ERROR));
+                    }
+                });
 
         // 이미 포인트 받은 미션이면 종료
         if (memberMission.getStatus() == MissionStatus.RECEIVED) {
@@ -63,9 +73,10 @@ public class MissionService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
         Mission mission = missionRepository.findByCode(missionCode)
-                .orElseThrow(() -> new IllegalArgumentException("미션 없음"));
-        MemberMission memberMission = memberMissionRepository.findByMemberAndMission(member, mission)
-                .orElseThrow(() -> new IllegalStateException("미션 수행 기록이 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
+        MemberMission memberMission =
+                memberMissionRepository.findByMemberAndMissionForUpdate(member, mission)
+                        .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_COMPLETED));
 
         if (memberMission.getStatus() == MissionStatus.INCOMPLETE) {
             throw new BaseException(ErrorType.MISSION_NOT_COMPLETED);
@@ -76,6 +87,5 @@ public class MissionService {
         }
         // COMPLETED -> RECEIVED
         memberMission.receive();
-
     }
 }
