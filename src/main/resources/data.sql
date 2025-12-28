@@ -1,4 +1,4 @@
-INSERT INTO mission (code, title, reward_point, description)
+INSERT INTO mission (code, title, reward_point, detail)
 VALUES
     (
         'LINK_GUARDIAN',
