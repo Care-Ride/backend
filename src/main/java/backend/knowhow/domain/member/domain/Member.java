@@ -1,22 +1,30 @@
 package backend.knowhow.domain.member.domain;
 
+import backend.knowhow.domain.auth.domain.SocialType;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private Long kakaoId;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SocialType socialType;
+
+    @Column(nullable = false)
+    private String socialId;
 
     private String nickname;
 
@@ -24,15 +32,23 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public Member(KakaoUserInfo info) {
-        this.kakaoId = info.getId();
-        this.nickname = info.getNickname();
-        this.role = Role.NONE;
+    // 정적 팩토리 메서드
+
+    public static Member createKakaoMember(KakaoUserInfo info) {
+        Member member = new Member();
+        member.socialType = SocialType.KAKAO;
+        member.socialId = String.valueOf(info.id());
+        member.nickname = info.nickname();
+        member.role = Role.NONE;
+        return member;
     }
 
-    // 테스트 계정 생성자
-    public Member(String nickname, Role role) {
-        this.nickname = nickname;
-        this.role = role;
+    public static Member createTestMember(String nickname, Role role) {
+        Member member = new Member();
+        member.socialType = SocialType.TEST;
+        member.socialId = "TEST_" + UUID.randomUUID();
+        member.nickname = nickname;
+        member.role = role;
+        return member;
     }
 }
