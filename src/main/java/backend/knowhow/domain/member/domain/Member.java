@@ -13,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"social_type", "social_id"}))
 public class Member {
 
     @Id
@@ -20,10 +21,11 @@ public class Member {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "social_type", nullable = false)
     private SocialType socialType;
 
-    @Column(nullable = false)
+
+    @Column(name = "social_id", nullable = false)
     private String socialId;
 
     private String nickname;
