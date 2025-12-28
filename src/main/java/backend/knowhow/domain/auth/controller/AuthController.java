@@ -25,7 +25,7 @@ public class AuthController {
     @PostMapping("/kakao")
     public ApiResponse<LoginResponse> loginKakao(@RequestBody KakaoLoginRequest request) {
 
-        LoginResponse response = authService.loginKakao(request.getAccessToken());
+        LoginResponse response = authService.loginKakao(request.accessToken());
 
         return ApiResponse.success(response);
     }

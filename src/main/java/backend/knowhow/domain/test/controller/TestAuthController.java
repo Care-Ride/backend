@@ -28,7 +28,7 @@ public class TestAuthController {
     public ApiResponse<TestMemberResponse> createTestMember(
             @RequestBody TestMemberRequest request
     ) {
-        Member member = new Member(request.nickname(), request.role());
+        Member member = Member.createTestMember(request.nickname(), request.role());
         memberRepository.save(member);
 
         return ApiResponse.success(new TestMemberResponse(member.getId()));

@@ -1,5 +1,6 @@
 package backend.knowhow.domain.auth.service;
 
+import backend.knowhow.domain.auth.domain.SocialType;
 import backend.knowhow.domain.auth.dto.response.LoginResponse;
 import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
 import backend.knowhow.domain.member.domain.Member;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -29,14 +31,29 @@ public class AuthService {
     private final DrivingSessionRepository drivingSessionRepository;
     private final MemberDeviceSettingRepository memberDeviceSettingRepository;
     private final KakaoAuthService kakaoAuthService;
+    private final GoogleAuthService googleAuthService;
     private final JwtUtil jwtUtil;
 
-    public LoginResponse loginKakao(String accessToken) {
+    // Kakao Login
+    public LoginResponse loginKakao(String accessToken){
 
         KakaoUserInfo userInfo = kakaoAuthService.getUserInfo(accessToken);
+        String socialId = String.valueOf(userInfo.id());
 
-        Member member = memberRepository.findByKakaoId(userInfo.getId())
-                .orElseGet(() -> memberRepository.save(new Member(userInfo)));
+        Member member = memberRepository
+                .findBySocialTypeAndSocialId(SocialType.KAKAO, socialId)
+                .orElseGet(() ->
+                        memberRepository.save(
+                                Member.createKakaoMember(userInfo)
+                        )
+                );
+
+        return issueTokens(member);
+    }
+
+
+    // Token Issue
+    private LoginResponse issueTokens(Member member) {
 
         // accessToken 발급
         String access = jwtUtil.createAccessToken(member.getId(), member.getRole());
@@ -46,7 +63,7 @@ public class AuthService {
         refreshTokenRepository.save(member.getId(), refresh);
 
         // 화면 세팅 여부
-        Boolean hasDeviceSetting = deviceSettingService.existsSettingByMember(member);
+        boolean hasDeviceSetting = deviceSettingService.existsSettingByMember(member);
 
         return new LoginResponse(access, refresh, hasDeviceSetting);
     }
