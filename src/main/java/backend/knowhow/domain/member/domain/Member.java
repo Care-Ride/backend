@@ -2,6 +2,8 @@ package backend.knowhow.domain.member.domain;
 
 import backend.knowhow.domain.auth.domain.SocialType;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
+import backend.knowhow.global.common.exception.BaseException;
+import backend.knowhow.global.common.response.ErrorType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,16 +30,16 @@ public class Member {
     @Column(name = "social_id", nullable = false)
     private String socialId;
 
+    @Column(nullable = false)
     private String nickname;
 
     @Setter
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // 구글 로그인 시 닉네임 없으면 임시 닉네임 생성
-    private static String generateTempNickname() {
-        return "USER_" + UUID.randomUUID().toString().substring(0, 8);
-    }
+    // 현재 보유 포인트
+    @Column(nullable = false)
+    private int pointBalance = 0;
 
     // 정적 팩토리 메서드
 
@@ -69,4 +71,32 @@ public class Member {
         member.role = role;
         return member;
     }
+
+    // 도메인 메서드
+
+    public void addPoint(int amount) {
+        if (amount <= 0) {
+            throw new BaseException(ErrorType.INVALID_POINT_AMOUNT);
+        }
+        this.pointBalance += amount;
+    }
+
+    public void usePoint(int amount) {
+        if (amount <= 0) {
+            throw new BaseException(ErrorType.INVALID_POINT_AMOUNT);
+        }
+        if (this.pointBalance < amount) {
+            throw new BaseException(ErrorType.INSUFFICIENT_POINTS);
+        }
+        this.pointBalance -= amount;
+    }
+
+    // 내부 메서드
+
+    // 구글 로그인 시 닉네임 없으면 임시 닉네임 생성
+    private static String generateTempNickname() {
+        return "USER_" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+
 }

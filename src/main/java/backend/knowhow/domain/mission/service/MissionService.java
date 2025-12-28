@@ -24,6 +24,7 @@ public class MissionService {
     private final MemberRepository memberRepository;
     private final MissionRepository missionRepository;
     private final MemberMissionRepository memberMissionRepository;
+    private final PointService pointService;
 
     @Transactional(readOnly = true)
     public List<MissionResponse> getMyMissions(Long memberId) {
@@ -88,5 +89,8 @@ public class MissionService {
         }
         // COMPLETED -> RECEIVED
         memberMission.receive();
+
+        // 포인트 지급 및 내역 생성
+        pointService.earnMissionReward(member.getId(), mission.getRewardPoint(), mission.getTitle());
     }
 }
