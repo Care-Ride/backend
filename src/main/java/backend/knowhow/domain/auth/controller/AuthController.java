@@ -1,5 +1,6 @@
 package backend.knowhow.domain.auth.controller;
 
+import backend.knowhow.domain.auth.dto.request.GoogleLoginRequest;
 import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.request.KakaoLoginRequest;
 import backend.knowhow.domain.auth.dto.request.ReissueRequest;
@@ -27,6 +28,12 @@ public class AuthController {
 
         LoginResponse response = authService.loginKakao(request.accessToken());
 
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/google")
+    public ApiResponse<LoginResponse> loginGoogle(@RequestBody GoogleLoginRequest request) {
+        LoginResponse response = authService.loginGoogle(request.idToken());
         return ApiResponse.success(response);
     }
 

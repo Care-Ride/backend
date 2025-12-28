@@ -32,6 +32,11 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    // 구글 로그인 시 닉네임 없으면 임시 닉네임 생성
+    private static String generateTempNickname() {
+        return "USER_" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
     // 정적 팩토리 메서드
 
     public static Member createKakaoMember(KakaoUserInfo info) {
@@ -39,6 +44,17 @@ public class Member {
         member.socialType = SocialType.KAKAO;
         member.socialId = String.valueOf(info.id());
         member.nickname = info.nickname();
+        member.role = Role.NONE;
+        return member;
+    }
+
+    public static Member createGoogleMember(String googleSub, String nickname) {
+        Member member = new Member();
+        member.socialType = SocialType.GOOGLE;
+        member.socialId = googleSub;
+        member.nickname = (nickname == null || nickname.isBlank())
+                ? generateTempNickname()
+                : nickname;
         member.role = Role.NONE;
         return member;
     }

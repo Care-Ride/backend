@@ -29,6 +29,7 @@ public enum ErrorType {
 
     // OAuth
     KAKAO_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "KAKAO-401", "카카오 AccessToken이 유효하지 않습니다."),
+    GOOGLE_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "GOOGLE-401", "구글 ID Token이 유효하지 않습니다."),
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL-500", "외부 API 호출 중 오류가 발생했습니다."),
 
     // Connection
