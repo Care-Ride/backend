@@ -48,6 +48,7 @@ public class SecurityConfig {
                     }
                     req.requestMatchers(
                             "/auth/kakao",
+                            "/auth/google",
                             "/auth/refresh",
                             "/auth/test/*"
                     ).permitAll();

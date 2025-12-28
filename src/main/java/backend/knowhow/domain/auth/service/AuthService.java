@@ -1,6 +1,7 @@
 package backend.knowhow.domain.auth.service;
 
 import backend.knowhow.domain.auth.domain.SocialType;
+import backend.knowhow.domain.auth.dto.response.GoogleUserInfo;
 import backend.knowhow.domain.auth.dto.response.LoginResponse;
 import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
 import backend.knowhow.domain.member.domain.Member;
@@ -51,6 +52,22 @@ public class AuthService {
         return issueTokens(member);
     }
 
+    // Google Login
+    public LoginResponse loginGoogle(String idToken) {
+
+        GoogleUserInfo userInfo = googleAuthService.getUserInfo(idToken);
+
+        Member member = memberRepository.findBySocialTypeAndSocialId(
+                        SocialType.GOOGLE,
+                        userInfo.sub())
+                .orElseGet(()->
+                        memberRepository.save(
+                                Member.createGoogleMember(userInfo.sub(), userInfo.nickname())
+                        )
+                );
+
+        return issueTokens(member);
+    }
 
     // Token Issue
     private LoginResponse issueTokens(Member member) {
