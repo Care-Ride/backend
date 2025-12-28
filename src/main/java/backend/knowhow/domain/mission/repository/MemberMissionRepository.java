@@ -20,5 +20,6 @@ public interface MemberMissionRepository extends JpaRepository<MemberMission, Lo
 
     Optional<MemberMission> findByMemberAndMission(Member member, Mission mission);
 
-    List<MemberMission> findAllByMember(Member member);
+    @Query("select mm from MemberMission mm join fetch mm.mission where mm.member = :member")
+    List<MemberMission> findAllByMemberWithMission(Member member);
 }
