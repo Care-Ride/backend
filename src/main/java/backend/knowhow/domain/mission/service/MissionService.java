@@ -31,7 +31,7 @@ public class MissionService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
         List<Mission> missions = missionRepository.findAll();
-        List<MemberMission> memberMissions = memberMissionRepository.findAllByMember(member);
+        List<MemberMission> memberMissions = memberMissionRepository.findAllByMemberWithMission(member);
 
         Map<MissionCode, MemberMission> map = memberMissions.stream()
                 .collect(Collectors.toMap(
