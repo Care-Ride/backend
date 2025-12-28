@@ -70,7 +70,8 @@ public class MissionService {
 
     @Transactional
     public void claimPoint(Long memberId, MissionCode missionCode) {
-        Member member = memberRepository.findById(memberId)
+        // Member를 락으로 읽어서 동시성 손실 방지
+        Member member = memberRepository.findByIdForUpdate(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
         Mission mission = missionRepository.findByCode(missionCode)
                 .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
