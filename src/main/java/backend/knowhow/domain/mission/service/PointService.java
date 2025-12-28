@@ -38,15 +38,15 @@ public class PointService {
 
 
     @Transactional
-    public void earnMissionReward(Long memberId, int rewardPoint, String description) {
+    public void earnMissionReward(Member member, int rewardPoint, String description) {
 
         if (rewardPoint <= 0) {
             throw new BaseException(ErrorType.INVALID_POINT_AMOUNT);
         }
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
-       member.addPoint(rewardPoint);
-       pointHistoryRepository.save(PointHistory.earn(member, rewardPoint, member.getPointBalance(), description));
+        member.addPoint(rewardPoint);
+        pointHistoryRepository.save(
+                PointHistory.earn(member, rewardPoint, member.getPointBalance(), description)
+        );
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class PointService {
         if (amount <= 0) {
             throw new BaseException(ErrorType.INVALID_POINT_AMOUNT);
         }
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdForUpdate(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
         member.usePoint(amount);
         pointHistoryRepository.save(PointHistory.spend(member, amount, member.getPointBalance(), description));

@@ -47,20 +47,21 @@ public class MissionService {
 
     @Transactional
     public void completeMission(Member member, MissionCode missionCode) {
+        // 재조회 : 외부에서 넘어온 Member 객체는 영속성 컨텍스트에 없을 수 있으므로(detached 상태) managed entity 보장하기 위함
+        Member managedMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+
         Mission mission = missionRepository.findByCode(missionCode)
                 .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
 
-        MemberMission memberMission = memberMissionRepository.findByMemberAndMission(member, mission)
-                .orElseGet(() -> {
-                    try {
-                        return memberMissionRepository.save(
-                                MemberMission.createNew(member, mission)
+        MemberMission memberMission =
+                memberMissionRepository.findByMemberAndMission(managedMember, mission)
+                        .orElseGet(() ->
+                                memberMissionRepository.save(
+                                        MemberMission.createNew(managedMember, mission)
+                                )
                         );
-                    } catch (DataIntegrityViolationException e) {
-                        return memberMissionRepository.findByMemberAndMission(member, mission)
-                                .orElseThrow(() -> new BaseException(ErrorType.INTERNAL_SERVER_ERROR));
-                    }
-                });
 
         // 이미 포인트 받은 미션이면 종료
         if (memberMission.getStatus() == MissionStatus.RECEIVED) {
@@ -91,6 +92,6 @@ public class MissionService {
         memberMission.receive();
 
         // 포인트 지급 및 내역 생성
-        pointService.earnMissionReward(member.getId(), mission.getRewardPoint(), mission.getTitle());
+        pointService.earnMissionReward(member, mission.getRewardPoint(), mission.getTitle());
     }
 }

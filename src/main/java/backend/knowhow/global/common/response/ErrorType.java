@@ -51,9 +51,9 @@ public enum ErrorType {
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "DRIVE-401", "날짜 형식이 올바르지 않습니다."),
 
     // Mission
-    MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "MISSION-400", "미션을 찾을 수 없습니다."),
-    MISSION_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MISSION-401", "아직 미션을 달성하지 않았습니다."),
-    MISSION_ALREADY_RECEIVED(HttpStatus.CONFLICT, "MISSION-402", "이미 포인트를 수령한 미션입니다."),
+    MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "MISSION-404", "미션을 찾을 수 없습니다."),
+    MISSION_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MISSION-400", "아직 미션을 달성하지 않았습니다."),
+    MISSION_ALREADY_RECEIVED(HttpStatus.CONFLICT, "MISSION-409", "이미 포인트를 수령한 미션입니다."),
 
     // Point
     INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "POINT-400", "포인트가 부족합니다."),
