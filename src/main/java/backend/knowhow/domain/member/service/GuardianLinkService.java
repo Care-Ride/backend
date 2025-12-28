@@ -7,6 +7,8 @@ import backend.knowhow.domain.member.dto.response.GuardianViewLinkResponse;
 import backend.knowhow.domain.member.dto.response.SeniorViewLinkResponse;
 import backend.knowhow.domain.member.repository.GuardianLinkRepository;
 import backend.knowhow.domain.member.repository.MemberRepository;
+import backend.knowhow.domain.mission.domain.MissionCode;
+import backend.knowhow.domain.mission.service.MissionService;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class GuardianLinkService {
 
     private final GuardianLinkRepository guardianLinkRepository;
     private final MemberRepository memberRepository;
+    private final MissionService missionService;
 
     public void link(Long guardianId, Long seniorId) {
 
@@ -34,6 +37,9 @@ public class GuardianLinkService {
         }
         GuardianLink link = new GuardianLink(guardian, senior);
         guardianLinkRepository.save(link);
+
+        missionService.completeMission(senior, MissionCode.LINK_GUARDIAN);
+        missionService.completeMission(guardian, MissionCode.LINK_GUARDIAN);
 
     }
 
