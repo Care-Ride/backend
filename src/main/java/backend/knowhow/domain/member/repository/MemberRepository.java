@@ -2,10 +2,17 @@ package backend.knowhow.domain.member.repository;
 
 import backend.knowhow.domain.auth.domain.SocialType;
 import backend.knowhow.domain.member.domain.Member;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findBySocialTypeAndSocialId(SocialType socialType, String socialId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select m from Member m where m.id = :id")
+    Optional<Member> findByIdForUpdate(Long id);
 }
