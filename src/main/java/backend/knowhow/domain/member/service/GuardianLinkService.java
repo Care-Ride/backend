@@ -24,6 +24,7 @@ public class GuardianLinkService {
     private final MemberRepository memberRepository;
     private final MissionService missionService;
 
+    @Transactional
     public void link(Long guardianId, Long seniorId) {
 
         Member guardian = memberRepository.findById(guardianId)
