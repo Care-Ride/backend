@@ -81,11 +81,6 @@ public class MissionService {
                                 )
                         );
 
-        // 같은 주행세션 중복 평가 방지
-        if (memberMission.getLastEvaluatedDrivingSessionId() != null &&
-                drivingSessionId.equals(memberMission.getLastEvaluatedDrivingSessionId())) {
-            return;
-        }
         memberMission.completeChallenge(drivingSessionId);
     }
 
