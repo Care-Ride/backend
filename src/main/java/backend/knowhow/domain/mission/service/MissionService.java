@@ -66,18 +66,14 @@ public class MissionService {
 
     @Transactional
     public void completeChallengeMission(Member member, MissionCode missionCode, Long drivingSessionId) {
-        Member managedMember = memberRepository.findById(member.getId())
-                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
-
-
         Mission mission = missionRepository.findByCode(missionCode)
                 .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
 
         MemberMission memberMission =
-                memberMissionRepository.findByMemberAndMission(managedMember, mission)
+                memberMissionRepository.findByMemberAndMission(member, mission)
                         .orElseGet(() ->
                                 memberMissionRepository.save(
-                                        MemberMission.createNew(managedMember, mission)
+                                        MemberMission.createNew(member, mission)
                                 )
                         );
 
