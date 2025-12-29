@@ -37,15 +37,37 @@ public class MemberMission {
     @Column(nullable = false)
     private MissionStatus status;
 
+    // 운전 챌린지 미션일 경우 마지막으로 평가된 운전 세션 ID
+    private Long lastEvaluatedDrivingSessionId;
+
     private LocalDateTime completedAt; // 조건 달성 시점
     private LocalDateTime receivedAt;  // 포인트 수령 시점
 
-    // 미션 달성
-    public void complete() {
+    // 도전과제형(1회성) 미션 달성
+    public void completeAchievement() {
         if (this.status == MissionStatus.INCOMPLETE) {
             this.status = MissionStatus.COMPLETED;
             this.completedAt = LocalDateTime.now();
         }
+    }
+
+    // 챌린지형 미션 달성
+    public void completeChallenge(Long drivingSessionId) {
+        if (drivingSessionId.equals(this.lastEvaluatedDrivingSessionId)) {
+            return;
+        }
+        this.status = MissionStatus.COMPLETED;
+        this.completedAt = LocalDateTime.now();
+        this.lastEvaluatedDrivingSessionId = drivingSessionId;
+    }
+
+    // 챌린지형 미션 초기화
+    public void resetChallenge() {
+        if (this.status == MissionStatus.INCOMPLETE) return;
+        this.status = MissionStatus.INCOMPLETE;
+        this.completedAt = null;
+        this.receivedAt = null;
+        this.lastEvaluatedDrivingSessionId = null;
     }
 
     // 포인트 수령

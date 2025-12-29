@@ -9,7 +9,6 @@ import backend.knowhow.domain.mission.repository.MissionRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +45,27 @@ public class MissionService {
     }
 
     @Transactional
-    public void completeMission(Member member, MissionCode missionCode) {
-        // 재조회 : 외부에서 넘어온 Member 객체는 영속성 컨텍스트에 없을 수 있으므로(detached 상태) managed entity 보장하기 위함
+    public void completeAchievementMission(Member member, MissionCode missionCode) {
+        Mission mission = missionRepository.findByCode(missionCode)
+                .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
+
+        MemberMission memberMission =
+                memberMissionRepository.findByMemberAndMission(member, mission)
+                        .orElseGet(() ->
+                                memberMissionRepository.save(
+                                        MemberMission.createNew(member, mission)
+                                )
+                        );
+
+        // 이미 포인트 받은 미션이면 종료
+        if (memberMission.getStatus() == MissionStatus.RECEIVED) {
+            return;
+        }
+        memberMission.completeAchievement();
+    }
+
+    @Transactional
+    public void completeChallengeMission(Member member, MissionCode missionCode, Long drivingSessionId) {
         Member managedMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
@@ -63,11 +81,12 @@ public class MissionService {
                                 )
                         );
 
-        // 이미 포인트 받은 미션이면 종료
-        if (memberMission.getStatus() == MissionStatus.RECEIVED) {
+        // 같은 주행세션 중복 평가 방지
+        if (memberMission.getLastEvaluatedDrivingSessionId() != null &&
+                drivingSessionId.equals(memberMission.getLastEvaluatedDrivingSessionId())) {
             return;
         }
-        memberMission.complete();
+        memberMission.completeChallenge(drivingSessionId);
     }
 
     @Transactional
@@ -93,5 +112,17 @@ public class MissionService {
 
         // 포인트 지급 및 내역 생성
         pointService.earnMissionReward(member, mission.getRewardPoint(), mission.getTitle());
+    }
+
+    @Transactional
+    public void resetChallengeMissionsForDrive(Member member) {
+        // 호출한 메서드의 @Transactional(Propagation.REQUIRED) 전파 범위 내에서 이미 영속화된 Member 객체가 넘어오므로 그대로 사용
+        List<MemberMission> missions =
+                memberMissionRepository.findAllByMemberWithMission(member);
+        for (MemberMission mm : missions) {
+            if (mm.getMission().getType() == MissionType.CHALLENGE) {
+                mm.resetChallenge();
+            }
+        }
     }
 }
