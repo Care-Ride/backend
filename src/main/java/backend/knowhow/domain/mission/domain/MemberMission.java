@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -54,7 +55,7 @@ public class MemberMission {
     // 챌린지형 미션 달성
     public void completeChallenge(Long drivingSessionId) {
         // 같은 주행세션 중복 평가 방지
-        if (drivingSessionId.equals(this.lastEvaluatedDrivingSessionId)) {
+        if (Objects.equals(drivingSessionId, this.lastEvaluatedDrivingSessionId)) {
             return;
         }
         this.status = MissionStatus.COMPLETED;
