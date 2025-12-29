@@ -24,14 +24,19 @@ public class Mission {
     @Column(nullable = false, unique = true)
     private MissionCode code;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MissionType type;
+
     @Column(nullable = false, length = 500)
     private String detail;
 
-    public static Mission createMission(String title, int rewardPoint, MissionCode code, String detail) {
+    public static Mission createMission(String title, int rewardPoint, MissionCode code, MissionType missionType,String detail) {
         Mission mission = new Mission();
         mission.title = title;
         mission.rewardPoint = rewardPoint;
         mission.code = code;
+        mission.type = missionType;
         mission.detail = detail;
         return mission;
     }

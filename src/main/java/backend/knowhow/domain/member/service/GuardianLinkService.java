@@ -39,8 +39,8 @@ public class GuardianLinkService {
         GuardianLink link = new GuardianLink(guardian, senior);
         guardianLinkRepository.save(link);
 
-        missionService.completeMission(senior, MissionCode.LINK_GUARDIAN);
-        missionService.completeMission(guardian, MissionCode.LINK_GUARDIAN);
+        missionService.completeAchievementMission(senior, MissionCode.LINK_GUARDIAN);
+        missionService.completeAchievementMission(guardian, MissionCode.LINK_GUARDIAN);
 
     }
 

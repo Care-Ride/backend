@@ -14,6 +14,8 @@ import backend.knowhow.domain.driving.service.weather.KmaWeatherClient;
 import backend.knowhow.domain.driving.service.weather.WeatherConditionMapper;
 import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.repository.MemberRepository;
+import backend.knowhow.domain.mission.domain.MissionCode;
+import backend.knowhow.domain.mission.service.MissionService;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
-import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +40,7 @@ public class DrivingService {
     private final DrivingSessionRepository drivingSessionRepository;
     private final MemberRepository memberRepository;
     private final WeatherConditionMapper weatherConditionMapper;
+    private final MissionService missionService;
 
     private static final LocalTime NIGHT_START = LocalTime.of(20, 0);   // 20:00
     private static final LocalTime NIGHT_END = LocalTime.of(6, 0);  // 6:00
@@ -84,6 +86,9 @@ public class DrivingService {
         Member driver = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
+        // 운전 시작 시 챌린지형 미션 리셋
+        missionService.resetChallengeMissionsForDrive(driver);
+
         DrivingSession drive = DrivingSession.start(driver, request.getLat(), request.getLon());
         DrivingSession saveDrive = drivingSessionRepository.save(drive);
         return new DriveStartResponse(saveDrive.getId(), saveDrive.getStartTime());
@@ -108,6 +113,8 @@ public class DrivingService {
 
         driveSession.finish(request.getTotalDistance(), request.getHardAccelCount(), request.getHardDecelCount(),
                 request.getLat(), request.getLon(), driveScore);
+
+        checkDriveChallengeMission(driver, driveSession);
 
         return DrivingSessionSummary.from(driveSession);
     }
@@ -182,4 +189,27 @@ public class DrivingService {
         else if(ratePer100km <= 14.0) return 2;
         else return 1;
     }
+
+    // 단일 주행 미션 판정
+    private void checkDriveChallengeMission(Member driver, DrivingSession drivingSession) {
+        int score = drivingSession.getScore();
+        double distance = drivingSession.getDistance();
+        Long drivingSessionId = drivingSession.getId();
+
+        if (score < 80) {
+            return;
+        }
+        if (distance >= 30) {
+            missionService.completeChallengeMission(driver, MissionCode.DRIVE_30KM_SAFE, drivingSessionId);
+            return;
+        }
+        if (distance >= 20) {
+            missionService.completeChallengeMission(driver, MissionCode.DRIVE_20KM_SAFE, drivingSessionId);
+            return;
+        }
+        if (distance >= 10) {
+            missionService.completeChallengeMission(driver, MissionCode.DRIVE_10KM_SAFE, drivingSessionId);
+        }
+    }
+
 }
