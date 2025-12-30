@@ -103,4 +103,14 @@ public class GuardianLinkService {
                 reversed
         );
     }
+
+    @Transactional
+    public void unlink(Long memberId) {
+        GuardianLink link = guardianLinkRepository
+                .findByGuardianId(memberId)
+                .or(() -> guardianLinkRepository.findBySeniorId(memberId))
+                .orElseThrow(() -> new BaseException(ErrorType.LINK_NOT_FOUND));
+
+        guardianLinkRepository.delete(link);
+    }
 }
