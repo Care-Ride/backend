@@ -6,7 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
+
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
-    Page<PointHistory> findAllByMember(Member member, Pageable pageable);
+    // 월 범위로 조회
+    Page<PointHistory> findAllByMemberAndCreatedAtBetween(Member member, LocalDateTime start, LocalDateTime end, Pageable pageable);
 }

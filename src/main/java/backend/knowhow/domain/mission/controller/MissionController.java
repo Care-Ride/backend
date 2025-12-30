@@ -44,8 +44,8 @@ public class MissionController {
 
     // 포인트 내역 조회
     @GetMapping("/points/history")
-    public ApiResponse<Page<PointHistoryResponse>> getHistory(@CurrentUser MemberPrincipal memberPrincipal, @RequestParam int page, @RequestParam int size) {
-        return ApiResponse.success((pointService.getPointHistory(memberPrincipal.getId(), page, size)));
+    public ApiResponse<Page<PointHistoryResponse>> getHistory(@CurrentUser MemberPrincipal memberPrincipal, @RequestParam int page, @RequestParam int size, @RequestParam(required = false) String yearMonth) {
+        return ApiResponse.success((pointService.getMonthlyPointHistory(memberPrincipal.getId(), page, size, yearMonth)));
     }
 
     // 포인트 사용하기
