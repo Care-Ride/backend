@@ -56,7 +56,8 @@ public class PointService {
         LocalDateTime end = month.plusMonths(1).atDay(1).atStartOfDay();    //다음달 1일 00:00
 
         return pointHistoryRepository
-                .findAllByMemberAndCreatedAtBetween(member, start, end, pageable)
+                .findAllByMemberAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+                        member, start,  end, pageable)
                 .map(PointHistoryResponse::from);
     }
 

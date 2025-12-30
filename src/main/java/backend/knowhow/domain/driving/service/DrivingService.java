@@ -123,7 +123,7 @@ public class DrivingService {
     public DailyDrivingListResponse getDailyDrivingRecords(LocalDate date, Long memberId) {
         Member driver = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
-        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetween(driver.getId(), date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeGreaterThanEqualAndStartTimeLessThanAndEndTimeIsNotNull(driver.getId(), date.atStartOfDay(), date.plusDays(1).atStartOfDay());
         List<DrivingSessionSummary> dtoList = drivingList.stream()
                 .map(DrivingSessionSummary::from)
                 .collect(Collectors.toList());
