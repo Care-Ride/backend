@@ -58,10 +58,12 @@ public class MissionService {
                         );
 
         // 이미 포인트 받은 미션이면 종료
-        if (memberMission.getStatus() == MissionStatus.RECEIVED) {
+        if (memberMission.getStatus() == MissionStatus.COMPLETED) {
             return;
         }
         memberMission.completeAchievement();
+
+        pointService.earnMissionReward(member, mission.getRewardPoint(), mission.getTitle());
     }
 
     @Transactional
@@ -77,31 +79,11 @@ public class MissionService {
                                 )
                         );
 
+        if (memberMission.getStatus() == MissionStatus.COMPLETED) {
+            return;
+        }
+
         memberMission.completeChallenge(drivingSessionId);
-    }
-
-    @Transactional
-    public void claimPoint(Long memberId, MissionCode missionCode) {
-        // Member를 락으로 읽어서 동시성 손실 방지
-        Member member = memberRepository.findByIdForUpdate(memberId)
-                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
-        Mission mission = missionRepository.findByCode(missionCode)
-                .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_FOUND));
-        MemberMission memberMission =
-                memberMissionRepository.findByMemberAndMissionForUpdate(member, mission)
-                        .orElseThrow(() -> new BaseException(ErrorType.MISSION_NOT_COMPLETED));
-
-        if (memberMission.getStatus() == MissionStatus.INCOMPLETE) {
-            throw new BaseException(ErrorType.MISSION_NOT_COMPLETED);
-        }
-
-        if (memberMission.getStatus() == MissionStatus.RECEIVED) {
-            throw new BaseException(ErrorType.MISSION_ALREADY_RECEIVED);
-        }
-        // COMPLETED -> RECEIVED
-        memberMission.receive();
-
-        // 포인트 지급 및 내역 생성
         pointService.earnMissionReward(member, mission.getRewardPoint(), mission.getTitle());
     }
 
@@ -111,7 +93,7 @@ public class MissionService {
         List<MemberMission> missions =
                 memberMissionRepository.findAllByMemberWithMission(member);
         for (MemberMission mm : missions) {
-            if (mm.getMission().getType() == MissionType.CHALLENGE) {
+            if (mm.getMission().getType() == MissionType.CHALLENGE && mm.getStatus() == MissionStatus.INCOMPLETE) {
                 mm.resetChallenge();
             }
         }

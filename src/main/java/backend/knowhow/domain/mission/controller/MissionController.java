@@ -29,13 +29,6 @@ public class MissionController {
         return ApiResponse.success(missionService.getMyMissions(memberPrincipal.getId()));
     }
 
-    // 미션 포인트 수령
-    @PostMapping("/{missionCode}/claim")
-    public ApiResponse<Void> claimMissionPoint(@CurrentUser MemberPrincipal memberPrincipal, @PathVariable MissionCode missionCode) {
-        missionService.claimPoint(memberPrincipal.getId(), missionCode);
-        return ApiResponse.success();
-    }
-
     // 포인트 잔액 조회
     @GetMapping("/points/balance")
     public ApiResponse<PointBalanceResponse> getBalance(@CurrentUser MemberPrincipal memberPrincipal) {
