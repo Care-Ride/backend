@@ -13,8 +13,7 @@ public record MissionResponse(
         String detail,
         int rewardPoint,
         MissionStatus status,
-        LocalDateTime completedAt,
-        LocalDateTime receivedAt
+        LocalDateTime completedAt
 ) {
     public static MissionResponse from(Mission mission, MemberMission memberMission) {
         if (memberMission == null) {
@@ -24,7 +23,6 @@ public record MissionResponse(
                     mission.getDetail(),
                     mission.getRewardPoint(),
                     MissionStatus.INCOMPLETE,
-                    null,
                     null
             );
         }
@@ -35,8 +33,7 @@ public record MissionResponse(
                 mission.getDetail(),
                 mission.getRewardPoint(),
                 memberMission.getStatus(),
-                memberMission.getCompletedAt(),
-                memberMission.getReceivedAt()
+                memberMission.getCompletedAt()
         );
     }
 }

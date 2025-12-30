@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -41,8 +40,7 @@ public class MemberMission {
     // 운전 챌린지 미션일 경우 마지막으로 평가된 운전 세션 ID
     private Long lastEvaluatedDrivingSessionId;
 
-    private LocalDateTime completedAt; // 조건 달성 시점
-    private LocalDateTime receivedAt;  // 포인트 수령 시점
+    private LocalDateTime completedAt; // 조건 달성 + 포인트 지급 시점
 
     // 도전과제형(1회성) 미션 달성
     public void completeAchievement() {
@@ -58,6 +56,9 @@ public class MemberMission {
         if (drivingSessionId != null && drivingSessionId.equals(this.lastEvaluatedDrivingSessionId)) {
             return;
         }
+        if (this.status == MissionStatus.COMPLETED) {
+            return;
+        }
         this.status = MissionStatus.COMPLETED;
         this.completedAt = LocalDateTime.now();
         this.lastEvaluatedDrivingSessionId = drivingSessionId;
@@ -65,19 +66,10 @@ public class MemberMission {
 
     // 챌린지형 미션 초기화
     public void resetChallenge() {
-        if (this.status == MissionStatus.INCOMPLETE) return;
-        this.status = MissionStatus.INCOMPLETE;
-        this.completedAt = null;
-        this.receivedAt = null;
-        this.lastEvaluatedDrivingSessionId = null;
-    }
-
-    // 포인트 수령
-    public void receive() {
-        if (this.status == MissionStatus.COMPLETED) {
-            this.status = MissionStatus.RECEIVED;
-            this.receivedAt = LocalDateTime.now();
+        if (this.status != MissionStatus.INCOMPLETE) {
+            return;
         }
+        this.lastEvaluatedDrivingSessionId = null;
     }
 
     @Builder(access = AccessLevel.PRIVATE)
