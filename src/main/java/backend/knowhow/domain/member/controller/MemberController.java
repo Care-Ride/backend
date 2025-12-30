@@ -110,4 +110,12 @@ public class MemberController {
         );
     }
 
+    // 연동 해제하기
+    @PreAuthorize("hasAnyRole('GUARDIAN', 'SENIOR')")
+    @DeleteMapping("/link")
+    public ApiResponse<Void> unlink(@CurrentUser MemberPrincipal member) {
+        guardianLinkService.unlink(member.getId());
+        return ApiResponse.success();
+    }
+
 }
