@@ -11,5 +11,5 @@ import java.time.LocalDateTime;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
     // 월 범위로 조회
-    Page<PointHistory> findAllByMemberAndCreatedAtBetween(Member member, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<PointHistory> findAllByMemberAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(Member member, LocalDateTime start, LocalDateTime end, Pageable pageable);
 }

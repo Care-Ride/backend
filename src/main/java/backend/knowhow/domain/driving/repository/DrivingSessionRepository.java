@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DrivingSessionRepository extends JpaRepository<DrivingSession, Long> {
-    List<DrivingSession> findAllByDriverIdAndStartTimeBetween(
+    List<DrivingSession> findAllByDriverIdAndStartTimeGreaterThanEqualAndStartTimeLessThanAndEndTimeIsNotNull(
             Long driverId,
             LocalDateTime start,
             LocalDateTime end
