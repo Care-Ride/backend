@@ -14,6 +14,8 @@ public enum ErrorType {
     FORBIDDEN(HttpStatus.FORBIDDEN,"COMMON-403", "접근이 거부되었습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON-404", "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"COMMON-500", "서버 내부 오류입니다."),
+    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "COMMON-405", "날짜 형식이 올바르지 않습니다."),
+    INVALID_PAGE_REQUEST(HttpStatus.BAD_REQUEST, "COMMON-406", "페이지 요청 값이 올바르지 않습니다."),
 
     // Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-404", "회원을 찾을 수 없습니다."),
@@ -48,7 +50,6 @@ public enum ErrorType {
     DRIVE_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "DRIVE-401", "이미 운전이 종료가 된 세션입니다."),
     DRIVE_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "DRIVE-404", "운전세션을 찾을 수 없습니다."),
     DRIVE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "DRIVE-406", "해당 운전세션에 접근 권한이 없습니다."),
-    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "DRIVE-402", "날짜 형식이 올바르지 않습니다."),
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "MISSION-404", "미션을 찾을 수 없습니다."),

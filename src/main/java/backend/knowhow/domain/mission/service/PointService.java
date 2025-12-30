@@ -17,22 +17,46 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+
 @Service
 @RequiredArgsConstructor
 public class PointService {
     private final MemberRepository memberRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Transactional(readOnly = true)
-    public Page<PointHistoryResponse> getPointHistory(Long memberId, int page, int size) {
+    public Page<PointHistoryResponse> getMonthlyPointHistory(Long memberId, int page, int size, String yearMonth) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending()
-        );
+        if (page < 0 || size <= 0 || size > 50) {
+            throw new BaseException(ErrorType.INVALID_PAGE_REQUEST);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        YearMonth month;
+        if (yearMonth == null || yearMonth.isEmpty()) {
+            month = YearMonth.now();
+        } else {
+            try {
+                month = YearMonth.parse(yearMonth, YEAR_MONTH_FORMATTER);
+            } catch (DateTimeParseException e) {
+                throw new BaseException(ErrorType.INVALID_DATE_FORMAT);
+            }
+        }
+        LocalDateTime start = month.atDay(1).atStartOfDay();
+        LocalDateTime end = month.plusMonths(1).atDay(1).atStartOfDay();    //다음달 1일 00:00
+
         return pointHistoryRepository
-                .findAllByMember(member, pageable)
+                .findAllByMemberAndCreatedAtBetween(member, start, end, pageable)
                 .map(PointHistoryResponse::from);
     }
 
