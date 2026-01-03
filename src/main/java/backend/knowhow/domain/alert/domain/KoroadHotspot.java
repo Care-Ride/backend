@@ -23,7 +23,7 @@ public class KoroadHotspot {
      * - SCHOOL  : 어린이보호구역
      */
     @Column(nullable = false, length = 20)
-    private String type;
+    private KoroadType type;
 
     @Column(name = "afos_fid", length = 50)
     private String afosFid;

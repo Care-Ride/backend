@@ -25,7 +25,7 @@ public class KoroadApiClient {
     @Value("${koroad.base-url}")
     private String baseUrl;
 
-    private static final int searchYear = 2015;  // 최근 3년 기준 연도
+    private static final int searchYear = 2024;  // 최근 3년 기준 연도
     private static final String PATH_OLDMAN = "/frequentzoneOldman/getRestFrequentzoneOldman";
     private static final String PATH_CHILD = "/frequentzoneChild/getRestFrequentzoneChild";
     private static final String PATH_SCHOOL = "/frequentzoneChildSchool/getRestFrequentzoneChildSchool";
@@ -49,7 +49,7 @@ public class KoroadApiClient {
         String path = resolvePath(type);
 
         String url = baseUrl + path
-                + "?serviceKey=" + apiKey
+                + "?ServiceKey=" + apiKey
                 + "&searchYearCd=" + searchYear
                 + "&siDo=" + siDo
                 + "&guGun=" + guGun
