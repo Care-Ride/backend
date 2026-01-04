@@ -1,8 +1,10 @@
 package backend.knowhow.domain.gifticon.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -27,6 +29,13 @@ public class Gifticon {
     @Column(nullable = false, length = 500)
     private String imageKey;
 
+    @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    private Gifticon(GifticonProduct product, String imageKey) {
+        this.product = product;
+        this.imageKey = imageKey;
+    }
 }
