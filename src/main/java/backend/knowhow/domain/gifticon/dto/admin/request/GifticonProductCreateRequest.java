@@ -5,14 +5,13 @@ import lombok.Getter;
 
 @Getter
 public class GifticonProductCreateRequest {
-    private String imageUrl;
     private String brandName;
     private String productName;
     private int requiredPoint;
 
-    public GifticonProduct toEntity() {
+    public GifticonProduct toEntity(String imageKey) {
         return GifticonProduct.builder()
-                .imageUrl(imageUrl)
+                .imageUrl(imageKey)
                 .brandName(brandName)
                 .productName(productName)
                 .requiredPoint(requiredPoint)
