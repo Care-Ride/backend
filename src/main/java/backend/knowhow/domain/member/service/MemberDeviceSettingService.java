@@ -19,11 +19,11 @@ public class MemberDeviceSettingService {
     private final MemberDeviceSettingRepository settingRepository;
     private final MemberRepository memberRepository;
 
-    private static final int DEFAULT_LEVEL = 3;
+    private static final int DEFAULT_LEVEL = 4;
     
     @Transactional
     public DeviceSettingResponse saveOrUpdateSetting(Long memberId, DeviceSettingRequest request) {
-        int fontLevel = request.fontLevel() == null ? DEFAULT_LEVEL : request.fontLevel();  // null값이면 2로 기본 설정
+        int fontLevel = request.fontLevel() == null ? DEFAULT_LEVEL : request.fontLevel();  // null값이면 4로 기본 설정
         int volumeLevel = request.volumeLevel() == null ? DEFAULT_LEVEL : request.volumeLevel();
 
         Member member = memberRepository.findById(memberId)
@@ -57,7 +57,7 @@ public class MemberDeviceSettingService {
 
         return settingRepository.findByMember(member)
                 .map(setting -> DeviceSettingResponse.from(setting))
-                // DB에 없으면 기본값(3,3)로 응답 (DB에 저장은 안 함)
+                // DB에 없으면 기본값(4,4)로 응답 (DB에 저장은 안 함)
                 .orElseGet(() -> DeviceSettingResponse.from(DEFAULT_LEVEL, DEFAULT_LEVEL));
     }
 
