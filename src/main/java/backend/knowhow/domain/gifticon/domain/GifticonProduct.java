@@ -12,7 +12,6 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Table(name = "gifticon_product")
 @NoArgsConstructor(access = PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
 public class GifticonProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
