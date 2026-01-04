@@ -11,7 +11,7 @@ public class GifticonProductCreateRequest {
 
     public GifticonProduct toEntity(String imageKey) {
         return GifticonProduct.builder()
-                .imageUrl(imageKey)
+                .imageKey(imageKey)
                 .brandName(brandName)
                 .productName(productName)
                 .requiredPoint(requiredPoint)

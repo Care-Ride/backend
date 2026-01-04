@@ -18,10 +18,21 @@ public class GifticonProductSummary {
     private int requiredPoint;
     private int stock;
 
+    public static GifticonProductSummary of(GifticonProduct product, String presignedImageUrl){
+        return GifticonProductSummary.builder()
+                .id(product.getId())
+                .imageUrl(presignedImageUrl)
+                .brandName(product.getBrandName())
+                .productName(product.getProductName())
+                .requiredPoint(product.getRequiredPoint())
+                .stock(product.getStock())
+                .build();
+    }
+
     public static GifticonProductSummary from(GifticonProduct product){
         return GifticonProductSummary.builder()
                 .id(product.getId())
-                .imageUrl(product.getImageUrl())
+                .imageUrl(product.getImageKey())
                 .brandName(product.getBrandName())
                 .productName(product.getProductName())
                 .requiredPoint(product.getRequiredPoint())
