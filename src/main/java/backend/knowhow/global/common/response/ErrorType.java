@@ -61,7 +61,11 @@ public enum ErrorType {
     INVALID_POINT_AMOUNT(HttpStatus.BAD_REQUEST, "POINT-401", "포인트 금액이 올바르지 않습니다."),
 
     //Gifticon
-    GIFTICON_ALREADY_EXIST(HttpStatus.CONFLICT, "GIFTICON-409", "이미 존재하는 기프티콘입니다. 추가할 수 없습니다.");
+    GIFTICON_ALREADY_EXIST(HttpStatus.CONFLICT, "GIFTICON-409", "이미 존재하는 기프티콘입니다. 추가할 수 없습니다."),
+
+    // Image
+    IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE-500", "이미지 업로드 중 에러가 발생했습니다."),
+    INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "IMAGE-400", "이미지가 비어있거나 형식이 올바르지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

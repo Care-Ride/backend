@@ -4,12 +4,14 @@ import backend.knowhow.domain.gifticon.domain.GifticonProduct;
 import backend.knowhow.domain.gifticon.dto.admin.request.GifticonProductCreateRequest;
 import backend.knowhow.domain.gifticon.dto.summary.GifticonProductSummary;
 import backend.knowhow.domain.gifticon.repository.GifticonProductRepository;
+import backend.knowhow.domain.gifticon.service.s3.S3Storage;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class AdminGifticonService {
     
     private final GifticonProductRepository gifticonProductRepository;
+    private final S3Storage s3Storage;
 
     @Transactional(readOnly = true)
     public List<GifticonProductSummary> getAllProducts() {
@@ -32,14 +35,19 @@ public class AdminGifticonService {
     }
 
     @Transactional
-    public GifticonProductSummary addGifticonProduct(GifticonProductCreateRequest request) {
+    public GifticonProductSummary addGifticonProduct(GifticonProductCreateRequest request, MultipartFile image) {
+        log.info("image upload start, {}", request.getProductName());
         // 이미 존재하는 상품인지 확인
         Optional<GifticonProduct> existProduct = gifticonProductRepository.findByBrandNameAndProductName(request.getBrandName(), request.getProductName());
         if(existProduct.isPresent()) {
             throw new BaseException(ErrorType.GIFTICON_ALREADY_EXIST);
         }
 
-        GifticonProduct gifticonProduct = request.toEntity();
+        // 이미지 저장
+        String imageKey = s3Storage.upload(image, "gifticon_product");
+        log.info("image upload success");
+
+        GifticonProduct gifticonProduct = request.toEntity(imageKey);
         GifticonProduct saveProduct = gifticonProductRepository.save(gifticonProduct);
 
         return GifticonProductSummary.from(saveProduct);
