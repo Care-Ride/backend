@@ -18,7 +18,7 @@ public class GifticonProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;
+    private String imageKey;
 
     // 사용처명
     @Column(nullable = false)
@@ -37,8 +37,8 @@ public class GifticonProduct {
     private int stock;
 
     @Builder
-    private GifticonProduct(String imageUrl, String brandName, String productName, int requiredPoint, int stock){
-        this.imageUrl = imageUrl;
+    private GifticonProduct(String imageKey, String brandName, String productName, int requiredPoint, int stock){
+        this.imageKey = imageKey;
         this.brandName = brandName;
         this.productName = productName;
         this.requiredPoint = requiredPoint;

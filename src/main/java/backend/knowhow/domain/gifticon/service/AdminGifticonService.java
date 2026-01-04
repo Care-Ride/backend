@@ -36,7 +36,6 @@ public class AdminGifticonService {
 
     @Transactional
     public GifticonProductSummary addGifticonProduct(GifticonProductCreateRequest request, MultipartFile image) {
-        log.info("image upload start, {}", request.getProductName());
         // 이미 존재하는 상품인지 확인
         Optional<GifticonProduct> existProduct = gifticonProductRepository.findByBrandNameAndProductName(request.getBrandName(), request.getProductName());
         if(existProduct.isPresent()) {
@@ -45,7 +44,6 @@ public class AdminGifticonService {
 
         // 이미지 저장
         String imageKey = s3Storage.upload(image, "gifticon_product");
-        log.info("image upload success");
 
         GifticonProduct gifticonProduct = request.toEntity(imageKey);
         GifticonProduct saveProduct = gifticonProductRepository.save(gifticonProduct);

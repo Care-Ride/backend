@@ -25,7 +25,7 @@ public class Gifticon {
 
     // 실제 기프티콘 이미지 URL
     @Column(nullable = false, length = 500)
-    private String imageUrl;
+    private String imageKey;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
