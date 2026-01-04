@@ -24,6 +24,8 @@ public class GifticonService {
     private final GifticonProductRepository gifticonProductRepository;
     private final S3PresignedUrlProvider s3PresignedUrlProvider;
 
+    private static final Duration IMAGE_URL_EXPIRE = Duration.ofMinutes(3); // presigned image 파기 시간
+
     @Transactional(readOnly = true)
     public GifticonProductListResponse getAvailableProducts(int page, int size){
         // 재고가 0 이상인 상품 조회 (페이징)
@@ -32,9 +34,15 @@ public class GifticonService {
         
         // 이미지 presigned url 생성
         Page<GifticonProductSummary> summaries = products.map(product -> {
+            // 이미지 비어있으면 null값 입력
+            String imageKey = product.getImageKey();
+            if(imageKey== null || imageKey.isBlank()){
+                return GifticonProductSummary.of(product, null);
+            }
+            
             String presignedUrl = s3PresignedUrlProvider.getPresignedGetUrl(
-                    product.getImageKey(),
-                    Duration.ofMinutes(3)
+                    imageKey,
+                    IMAGE_URL_EXPIRE
             );
             return GifticonProductSummary.of(product, presignedUrl);
         });
