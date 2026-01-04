@@ -4,6 +4,7 @@ import backend.knowhow.domain.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ public class GifticonUsage {
     @Column(nullable = false)
     private GifticonUsageStatus status;
 
+    @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }
