@@ -58,8 +58,10 @@ public enum ErrorType {
 
     // Point
     INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "POINT-400", "포인트가 부족합니다."),
-    INVALID_POINT_AMOUNT(HttpStatus.BAD_REQUEST, "POINT-401", "포인트 금액이 올바르지 않습니다.");
+    INVALID_POINT_AMOUNT(HttpStatus.BAD_REQUEST, "POINT-401", "포인트 금액이 올바르지 않습니다."),
 
+    //Gifticon
+    GIFTICON_ALREADY_EXIST(HttpStatus.CONFLICT, "GIFTICON-409", "이미 존재하는 기프티콘입니다. 추가할 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
