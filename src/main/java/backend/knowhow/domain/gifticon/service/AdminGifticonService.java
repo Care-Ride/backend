@@ -45,9 +45,14 @@ public class AdminGifticonService {
         // 이미지 저장
         String imageKey = s3Storage.upload(image, "gifticon_product");
 
-        GifticonProduct gifticonProduct = request.toEntity(imageKey);
-        GifticonProduct saveProduct = gifticonProductRepository.save(gifticonProduct);
-
-        return GifticonProductSummary.from(saveProduct);
+        // DB 저장 실패 시 S3 파일 삭제
+        try{
+            GifticonProduct gifticonProduct = request.toEntity(imageKey);
+            GifticonProduct saveProduct = gifticonProductRepository.save(gifticonProduct);
+            return GifticonProductSummary.from(saveProduct);
+        } catch (Exception e){
+            s3Storage.delete(imageKey);
+            throw new BaseException(ErrorType.IMAGE_UPLOAD_ERROR);
+        }
     }
 }
