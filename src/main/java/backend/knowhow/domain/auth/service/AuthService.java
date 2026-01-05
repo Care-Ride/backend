@@ -13,6 +13,7 @@ import backend.knowhow.domain.member.repository.MemberDeviceSettingRepository;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.auth.repository.RefreshTokenRepository;
 import backend.knowhow.domain.member.service.MemberDeviceSettingService;
+import backend.knowhow.domain.mission.repository.MemberMissionRepository;
 import backend.knowhow.domain.mission.repository.PointHistoryRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
@@ -33,6 +34,7 @@ public class AuthService {
     private final DrivingSessionRepository drivingSessionRepository;
     private final MemberDeviceSettingRepository memberDeviceSettingRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final MemberMissionRepository memberMissionRepository;
     private final KakaoAuthService kakaoAuthService;
     private final GoogleAuthService googleAuthService;
     private final JwtUtil jwtUtil;
@@ -138,6 +140,7 @@ public class AuthService {
         drivingSessionRepository.deleteByDriver_Id(memberId);
         memberDeviceSettingRepository.deleteByMemberId(memberId);
         pointHistoryRepository.deleteByMemberId(memberId);
+        memberMissionRepository.deleteByMemberId(memberId);
         memberRepository.delete(member);
     }
 }
