@@ -62,6 +62,7 @@ public enum ErrorType {
 
     //Gifticon
     GIFTICON_ALREADY_EXIST(HttpStatus.CONFLICT, "GIFTICON-409", "이미 존재하는 기프티콘입니다. 추가할 수 없습니다."),
+    GIFTICON_NOT_FOUND(HttpStatus.NOT_FOUND, "GIFTICON-404", "존재하지 않는 상품입니다."),
 
     // Image
     IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE-500", "이미지 업로드 중 에러가 발생했습니다."),

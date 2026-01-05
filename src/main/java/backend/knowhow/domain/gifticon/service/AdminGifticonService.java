@@ -1,9 +1,13 @@
 package backend.knowhow.domain.gifticon.service;
 
+import backend.knowhow.domain.gifticon.domain.Gifticon;
 import backend.knowhow.domain.gifticon.domain.GifticonProduct;
+import backend.knowhow.domain.gifticon.dto.admin.request.GifticonBarcodeInsertRequest;
 import backend.knowhow.domain.gifticon.dto.admin.request.GifticonProductCreateRequest;
+import backend.knowhow.domain.gifticon.dto.summary.GifticonBarcodeSummary;
 import backend.knowhow.domain.gifticon.dto.summary.GifticonProductSummary;
 import backend.knowhow.domain.gifticon.repository.GifticonProductRepository;
+import backend.knowhow.domain.gifticon.repository.GifticonRepository;
 import backend.knowhow.domain.gifticon.service.s3.S3Storage;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 public class AdminGifticonService {
     
     private final GifticonProductRepository gifticonProductRepository;
+    private final GifticonRepository gifticonRepository;
     private final S3Storage s3Storage;
 
     @Transactional(readOnly = true)
@@ -50,6 +55,26 @@ public class AdminGifticonService {
             GifticonProduct gifticonProduct = request.toEntity(imageKey);
             GifticonProduct saveProduct = gifticonProductRepository.save(gifticonProduct);
             return GifticonProductSummary.from(saveProduct);
+        } catch (Exception e){
+            s3Storage.delete(imageKey);
+            throw new BaseException(ErrorType.IMAGE_UPLOAD_ERROR);
+        }
+    }
+
+    @Transactional
+    public GifticonBarcodeSummary addGifticonBarcodeImage(GifticonBarcodeInsertRequest request, MultipartFile image) {
+        GifticonProduct product = gifticonProductRepository.findById(request.getProductId())
+                .orElseThrow(() -> new BaseException(ErrorType.GIFTICON_NOT_FOUND));
+
+        // 이미지 저장
+        String imageKey = s3Storage.upload(image, "gifticon");
+        // DB 저장 실패 시 S3 파일 삭제
+        try{
+            Gifticon gifticon = request.toEntity(imageKey, product);
+            Gifticon savedGifticon = gifticonRepository.save(gifticon);
+            // product 재고 증가
+            product.increaseStock(1);
+            return GifticonBarcodeSummary.from(savedGifticon);
         } catch (Exception e){
             s3Storage.delete(imageKey);
             throw new BaseException(ErrorType.IMAGE_UPLOAD_ERROR);
