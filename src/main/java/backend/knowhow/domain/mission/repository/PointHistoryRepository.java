@@ -12,4 +12,6 @@ import java.time.LocalDateTime;
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
     // 월 범위로 조회
     Page<PointHistory> findAllByMemberAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(Member member, LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    void deleteByMemberId(Long memberId);
 }
