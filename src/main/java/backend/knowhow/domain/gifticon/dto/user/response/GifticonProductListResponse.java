@@ -1,11 +1,10 @@
-package backend.knowhow.domain.gifticon.dto.response;
+package backend.knowhow.domain.gifticon.dto.user.response;
 
 import backend.knowhow.domain.gifticon.dto.summary.GifticonProductSummary;
 import backend.knowhow.global.common.response.PageInfo;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record GifticonProductListResponse(
         List<GifticonProductSummary> products,

@@ -1,11 +1,10 @@
 package backend.knowhow.domain.gifticon.service;
 
 import backend.knowhow.domain.gifticon.domain.GifticonProduct;
-import backend.knowhow.domain.gifticon.dto.response.GifticonProductListResponse;
+import backend.knowhow.domain.gifticon.dto.user.response.GifticonProductListResponse;
 import backend.knowhow.domain.gifticon.dto.summary.GifticonProductSummary;
 import backend.knowhow.domain.gifticon.repository.GifticonProductRepository;
 import backend.knowhow.domain.gifticon.service.s3.S3PresignedUrlProvider;
-import backend.knowhow.global.common.response.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
