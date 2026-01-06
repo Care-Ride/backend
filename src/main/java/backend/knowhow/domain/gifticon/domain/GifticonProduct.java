@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -42,5 +41,13 @@ public class GifticonProduct {
         this.productName = productName;
         this.requiredPoint = requiredPoint;
         this.stock = stock;
+    }
+
+    public void increaseStock(int quantity) {
+        this.stock += quantity;
+    }
+
+    public void decreaseStock(int quantity) {
+        this.stock -= quantity;
     }
 }
