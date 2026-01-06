@@ -66,6 +66,10 @@ public enum ErrorType {
     GIFTICON_NOT_FOUND(HttpStatus.NOT_FOUND, "GIFTICON-404", "존재하지 않는 상품입니다."),
     INSUFFICIENT_POINT_BALANCE(HttpStatus.FORBIDDEN, "GIFTICON-403", "구매하기에 포인트가 부족합니다."),
     PURCHASE_OUT_OF_STOCK(HttpStatus.FORBIDDEN, "GIFTICON-403", "상품 재고가 부족하여 구매가 불가능합니다."),
+  
+    // Vehicle
+    VEHICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "VEHICLE-404", "차량을 찾을 수 없습니다."),
+    VEHICLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "VEHICLE-403", "해당 차량에 대한 접근 권한이 없습니다."),
 
     // Image
     IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE-500", "이미지 업로드 중 에러가 발생했습니다."),
