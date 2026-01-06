@@ -71,11 +71,11 @@ public class VehicleService {
     public void changeActiveVehicle(Long memberId, Long vehicleId) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new BaseException(ErrorType.VEHICLE_NOT_FOUND));
-        if (vehicle.isActive()) {
-            return;
-        }
         if (!vehicle.getOwner().getId().equals(memberId)) {
             throw new BaseException(ErrorType.VEHICLE_ACCESS_DENIED);
+        }
+        if (vehicle.isActive()) {
+            return;
         }
         vehicleRepository.deactivateAllActiveByOwner(vehicle.getOwner());
         vehicle.activate();
