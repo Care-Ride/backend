@@ -1,6 +1,7 @@
 package backend.knowhow.domain.driving.domain;
 
 import backend.knowhow.domain.member.domain.Member;
+import backend.knowhow.domain.vehicle.domain.Vehicle;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,6 +33,11 @@ public class DrivingSession {
     @JoinColumn(name = "member_id", nullable = false)
     private Member driver;
 
+    // 사용한 차량(nullable)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
+
     @Column(nullable = false)
     private LocalDateTime startTime;
 
@@ -48,6 +54,9 @@ public class DrivingSession {
 
     private int score;    // 운전 점수
 
+    @Column(nullable = false)
+    private boolean pointEligible;  // 포인트 적립 대상 여부(블루투스 연결 기준)
+
     // TODO: 논의 후 String 주소로 넣을 수도 있음.
     private double startLat;
     private double startLon;
@@ -56,21 +65,27 @@ public class DrivingSession {
 
     @Builder
     private DrivingSession(Member driver,
+                           Vehicle vehicle,
                            LocalDateTime startTime,
                            double startLat,
-                           double startLon) {
+                           double startLon,
+                           boolean pointEligible) {
         this.driver = driver;
+        this.vehicle = vehicle;
         this.startTime = startTime;
         this.startLat = startLat;
         this.startLon = startLon;
+        this.pointEligible = pointEligible;
     }
 
-    public static DrivingSession start(Member driver, double startLat, double startLon) {
+    public static DrivingSession start(Member driver, Vehicle vehicle, double startLat, double startLon, boolean pointEligible) {
         return DrivingSession.builder()
                 .driver(driver)
+                .vehicle(vehicle)
                 .startTime(LocalDateTime.now())
                 .startLat(startLat)
                 .startLon(startLon)
+                .pointEligible(pointEligible)
                 .build();
     }
 
