@@ -1,7 +1,7 @@
 package backend.knowhow.domain.driving.controller;
 
 import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
-import backend.knowhow.domain.driving.dto.request.LocationRequest;
+import backend.knowhow.domain.driving.dto.request.DriveStartRequest;
 import backend.knowhow.domain.driving.dto.response.*;
 import backend.knowhow.domain.driving.dto.summary.DrivingSessionSummary;
 import backend.knowhow.domain.driving.service.DrivingService;
@@ -22,7 +22,7 @@ public class DrivingController {
 
     // 운전 시작 전 위험요소 조회
     @PostMapping("/danger")
-    public ApiResponse<BeforeDriveDangerResponse> getDanger(@RequestBody LocationRequest request){
+    public ApiResponse<BeforeDriveDangerResponse> getDanger(@RequestBody DriveStartRequest request){
         BeforeDriveDangerResponse response = drivingService.getDangerBeforeDrive(request);
         return ApiResponse.success(response);
     }
@@ -37,10 +37,10 @@ public class DrivingController {
     // 운전 시작
     @PostMapping("/start")
     public ApiResponse<DriveStartResponse> startDriving(
-            @RequestBody LocationRequest locationRequest,
+            @RequestBody DriveStartRequest driveStartRequest,
             @CurrentUser MemberPrincipal user
     ){
-        DriveStartResponse response = drivingService.startDriving(user.getId(), locationRequest);
+        DriveStartResponse response = drivingService.startDriving(user.getId(), driveStartRequest);
         return ApiResponse.success(response);
     }
 
