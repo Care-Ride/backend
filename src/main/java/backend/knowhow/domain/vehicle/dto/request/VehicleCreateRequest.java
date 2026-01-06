@@ -1,7 +1,9 @@
 package backend.knowhow.domain.vehicle.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record VehicleCreateRequest(
-        String name,
-        String carNumber
+        @NotBlank String name,
+        @NotBlank String carNumber
 ) {
 }

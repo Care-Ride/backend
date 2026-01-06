@@ -8,6 +8,8 @@ import backend.knowhow.domain.vehicle.service.VehicleService;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
 import backend.knowhow.global.security.MemberPrincipal;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/vehicles")
+@RequestMapping("/api/vehicles")
 public class VehicleController {
 
     private final VehicleService vehicleService;
@@ -23,7 +25,7 @@ public class VehicleController {
     @PostMapping
     public ApiResponse<VehicleResponse> register(
             @CurrentUser MemberPrincipal memberPrincipal,
-            @RequestBody VehicleCreateRequest request
+            @Valid @RequestBody VehicleCreateRequest request
     ) {
         return ApiResponse.success(
                 vehicleService.registerVehicle(memberPrincipal.getId(), request)
@@ -43,7 +45,7 @@ public class VehicleController {
     @PatchMapping("/{vehicleId}/activate")
     public ApiResponse<Void> activate(
             @CurrentUser MemberPrincipal memberPrincipal,
-            @PathVariable Long vehicleId
+            @PathVariable @Positive Long vehicleId
     ) {
         vehicleService.changeActiveVehicle(memberPrincipal.getId(), vehicleId);
         return ApiResponse.success();
@@ -53,8 +55,8 @@ public class VehicleController {
     @PatchMapping("/{vehicleId}")
     public ApiResponse<VehicleResponse> updateInfo(
             @CurrentUser MemberPrincipal memberPrincipal,
-            @PathVariable Long vehicleId,
-            @RequestBody VehicleUpdateRequest request
+            @PathVariable @Positive Long vehicleId,
+            @Valid @RequestBody VehicleUpdateRequest request
     ) {
         return ApiResponse.success(
                 vehicleService.updateVehicle(
@@ -69,8 +71,8 @@ public class VehicleController {
     @PatchMapping("/{vehicleId}/ble")
     public ApiResponse<Void> bindBle(
             @CurrentUser MemberPrincipal memberPrincipal,
-            @PathVariable Long vehicleId,
-            @RequestBody BleBindRequest request
+            @PathVariable @Positive Long vehicleId,
+            @Valid @RequestBody BleBindRequest request
     ) {
         vehicleService.bindBleDevice(
                 memberPrincipal.getId(),
@@ -84,7 +86,7 @@ public class VehicleController {
     @DeleteMapping("/{vehicleId}/ble")
     public ApiResponse<Void> unbindBle(
             @CurrentUser MemberPrincipal memberPrincipal,
-            @PathVariable Long vehicleId
+            @PathVariable @Positive Long vehicleId
     ) {
         vehicleService.unbindBleDevice(
                 memberPrincipal.getId(),
