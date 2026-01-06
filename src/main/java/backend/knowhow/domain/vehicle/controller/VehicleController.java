@@ -1,8 +1,9 @@
 package backend.knowhow.domain.vehicle.controller;
 
-import backend.knowhow.domain.vehicle.dto.VehicleCreateRequest;
-import backend.knowhow.domain.vehicle.dto.VehicleResponse;
-import backend.knowhow.domain.vehicle.dto.VehicleUpdateRequest;
+import backend.knowhow.domain.vehicle.dto.request.BleBindRequest;
+import backend.knowhow.domain.vehicle.dto.request.VehicleCreateRequest;
+import backend.knowhow.domain.vehicle.dto.response.VehicleResponse;
+import backend.knowhow.domain.vehicle.dto.request.VehicleUpdateRequest;
 import backend.knowhow.domain.vehicle.service.VehicleService;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
@@ -63,4 +64,34 @@ public class VehicleController {
                 )
         );
     }
+
+    // BLE 연동
+    @PatchMapping("/{vehicleId}/ble")
+    public ApiResponse<Void> bindBle(
+            @CurrentUser MemberPrincipal memberPrincipal,
+            @PathVariable Long vehicleId,
+            @RequestBody BleBindRequest request
+    ) {
+        vehicleService.bindBleDevice(
+                memberPrincipal.getId(),
+                vehicleId,
+                request.getBleDeviceId()
+        );
+        return ApiResponse.success();
+    }
+
+    // BLE 연동 해제
+    @DeleteMapping("/{vehicleId}/ble")
+    public ApiResponse<Void> unbindBle(
+            @CurrentUser MemberPrincipal memberPrincipal,
+            @PathVariable Long vehicleId
+    ) {
+        vehicleService.unbindBleDevice(
+                memberPrincipal.getId(),
+                vehicleId
+        );
+        return ApiResponse.success();
+    }
+
+
 }

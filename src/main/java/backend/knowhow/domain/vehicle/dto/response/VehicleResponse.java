@@ -1,4 +1,4 @@
-package backend.knowhow.domain.vehicle.dto;
+package backend.knowhow.domain.vehicle.dto.response;
 
 import backend.knowhow.domain.vehicle.domain.Vehicle;
 

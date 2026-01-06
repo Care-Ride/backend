@@ -3,9 +3,9 @@ package backend.knowhow.domain.vehicle.service;
 import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.vehicle.domain.Vehicle;
-import backend.knowhow.domain.vehicle.dto.VehicleCreateRequest;
-import backend.knowhow.domain.vehicle.dto.VehicleResponse;
-import backend.knowhow.domain.vehicle.dto.VehicleUpdateRequest;
+import backend.knowhow.domain.vehicle.dto.request.VehicleCreateRequest;
+import backend.knowhow.domain.vehicle.dto.response.VehicleResponse;
+import backend.knowhow.domain.vehicle.dto.request.VehicleUpdateRequest;
 import backend.knowhow.domain.vehicle.repository.VehicleRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
@@ -44,7 +44,7 @@ public class VehicleService {
                 member,
                 request.name(),
                 request.carNumber(),
-                request.bleDeviceId(),
+              null,
                 makeActive
         );
 
@@ -79,5 +79,31 @@ public class VehicleService {
         }
         vehicleRepository.deactivateAllActiveByOwner(vehicle.getOwner());
         vehicle.activate();
+    }
+
+    // BLE 연동
+    @Transactional
+    public void bindBleDevice(Long memberId, Long vehicleId, String bleDeviceId) {
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new BaseException(ErrorType.VEHICLE_NOT_FOUND));
+
+        if (!vehicle.getOwner().getId().equals(memberId)) {
+            throw new BaseException(ErrorType.VEHICLE_ACCESS_DENIED);
+        }
+
+        vehicle.bindBle(bleDeviceId);
+    }
+
+    // BLE 연동 해제
+    @Transactional
+    public void unbindBleDevice(Long memberId, Long vehicleId) {
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new BaseException(ErrorType.VEHICLE_NOT_FOUND));
+
+        if (!vehicle.getOwner().getId().equals(memberId)) {
+            throw new BaseException(ErrorType.VEHICLE_ACCESS_DENIED);
+        }
+
+        vehicle.unbindBle();
     }
 }
