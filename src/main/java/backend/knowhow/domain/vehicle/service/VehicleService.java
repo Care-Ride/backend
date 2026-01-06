@@ -44,11 +44,13 @@ public class VehicleService {
                 member,
                 request.name(),
                 request.carNumber(),
-              null,
-                makeActive
+              null
         );
 
         vehicleRepository.save(vehicle);
+        if (makeActive) {
+            vehicle.activate();
+        }
         return VehicleResponse.from(vehicle);
     }
 

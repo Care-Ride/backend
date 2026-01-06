@@ -39,20 +39,19 @@ public class Vehicle {
     @Column(nullable = false)
     private boolean active = false;
 
-    private Vehicle(Member owner, String name, String carNumber, String bleDeviceId, boolean active) {
+    private Vehicle(Member owner, String name, String carNumber, String bleDeviceId) {
         this.owner = owner;
         this.name = name;
         this.carNumber = carNumber;
         this.bleDeviceId = bleDeviceId;
-        this.active = active;
+        this.active = false;
     }
 
-    public static Vehicle create(Member owner, String name, String carNumber, String bleDeviceId, boolean active) {
-        return new Vehicle(owner, name, carNumber, bleDeviceId, active);
+    public static Vehicle create(Member owner, String name, String carNumber, String bleDeviceId) {
+        return new Vehicle(owner, name, carNumber, bleDeviceId);
     }
 
     public void activate() { this.active = true; }
-    public void deactivate() { this.active = false; }
 
     public void updateInfo(String name, String carNumber) {
         this.name = name;
