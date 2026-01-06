@@ -93,8 +93,8 @@ public class DrivingService {
                 .findByOwnerIdAndActiveTrue(driver.getId())
                 .orElse(null);
 
-        // 포인트 적립 대상 조건 : active 차량 존재 && BLE 연결 상태
-        boolean pointEligible = activeVehicle != null && request.isBleConnected();
+        // 포인트 적립 대상 조건 : active 차량 존재 && 차량에 BLE 등록 && BLE 연결 상태
+        boolean pointEligible = activeVehicle != null && activeVehicle.getBleDeviceId() != null && request.isBleConnected();
 
         // 운전 시작 시 챌린지형 미션 리셋
         missionService.resetChallengeMissionsForDrive(driver);
