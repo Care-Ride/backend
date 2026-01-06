@@ -1,4 +1,4 @@
-package backend.knowhow.domain.vehicle.dto;
+package backend.knowhow.domain.vehicle.dto.request;
 
 public record VehicleUpdateRequest(
         String name,
