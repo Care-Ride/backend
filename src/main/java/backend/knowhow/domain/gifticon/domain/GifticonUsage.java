@@ -2,6 +2,7 @@ package backend.knowhow.domain.gifticon.domain;
 
 import backend.knowhow.domain.member.domain.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,10 +30,6 @@ public class GifticonUsage {
     @JoinColumn(name = "gifticon_id", nullable = false)
     private Gifticon gifticon;
 
-    // 지급 전화번호
-    @Column(nullable = false, length = 20)
-    private String phoneNumber;
-
     // 차감된 포인트
     @Column(nullable = false)
     private int spentPoints;
@@ -44,4 +41,28 @@ public class GifticonUsage {
     @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    private GifticonUsage(Member buyer, Gifticon gifticon, int spentPoints, GifticonUsageStatus status) {
+        this.buyer = buyer;
+        this.gifticon = gifticon;
+        this.spentPoints = spentPoints;
+        this.status = status;
+    }
+    public static GifticonUsage success(Member buyer, Gifticon gifticon, int spentPoints) {
+        return GifticonUsage.builder()
+                .buyer(buyer)
+                .gifticon(gifticon)
+                .spentPoints(spentPoints)
+                .status(GifticonUsageStatus.SUCCESS)
+                .build();
+    }
+
+    public void markSuccess() {
+        this.status = GifticonUsageStatus.SUCCESS;
+    }
+
+    public void markFailed() {
+        this.status = GifticonUsageStatus.FAILED;
+    }
 }
