@@ -18,7 +18,7 @@ public class MobilityController {
     @PostMapping("/call")
     public ApiResponse<MobilityResponse> call(@Valid @RequestBody MobilityRequest request) {
 
-        String phoneNumber = mobilityService.getPhoneNumber(request.lat(), request.lon(), request.mobilityType());
-        return ApiResponse.success(new MobilityResponse(phoneNumber));
+        MobilityResponse mobilityResponse = mobilityService.getCallTaxiInfo(request.lat(), request.lon(), request.mobilityType());
+        return ApiResponse.success(mobilityResponse);
     }
 }

@@ -1,5 +1,6 @@
 package backend.knowhow.domain.mobility.service;
 
+import backend.knowhow.domain.mobility.dto.RegionInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class ReverseGeoApiClient {
 
     private static final String NAVER_GEOCODE_URL = "https://maps.apigw.ntruss.com/map-reversegeocode/v2/gc";
 
-    public Optional<String> findRegionName(double lat, double lon) {
+    public Optional<RegionInfo> findRegionInfo(double lat, double lon) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-NCP-APIGW-API-KEY-ID", clientId);
         headers.set("X-NCP-APIGW-API-KEY", clientSecret);
@@ -57,20 +58,24 @@ public class ReverseGeoApiClient {
             }
             Map<?, ?> firstResult = (Map<?, ?>) results.get(0);
             Map<?, ?> region = (Map<?, ?>) firstResult.get("region");
+
             if (region == null) {
                 return Optional.empty();
             }
 
             Map<?, ?> area1 = (Map<?, ?>) region.get("area1");
+            Map<?, ?> area2 = (Map<?, ?>) region.get("area2");
+            Map<?, ?> area3 = (Map<?, ?>) region.get("area3");
             if (area1 == null) {
                 return Optional.empty();
             }
-            Object name = area1.get("name");
-            if (!(name instanceof String) || ((String) name).isBlank()) {
-                return Optional.empty();
-            }
+            String city = area1 != null ? (String) area1.get("name") : null;
+            String district = area2 != null ? (String) area2.get("name") : null;
+            String dong = area3 != null ? (String) area3.get("name") : null;
 
-            return Optional.of((String) name);
+            if (city == null) return Optional.empty();
+
+            return Optional.of(new RegionInfo(city, district, dong));
 
         } catch (HttpClientErrorException e) {
             log.error("[NaverMapClient] HTTP Error: status={}, body={}, lat={}, lon={}",
