@@ -8,10 +8,11 @@ import java.util.List;
 
 public record GifticonProductListResponse(
         List<GifticonProductSummary> products,
-        PageInfo pageInfo
+        PageInfo pageInfo,
+        int pointBalance
 ) {
-    public static GifticonProductListResponse from(Page<GifticonProductSummary> products) {
+    public static GifticonProductListResponse of(Page<GifticonProductSummary> products, int pointBalance) {
         PageInfo pageInfo = PageInfo.from(products);
-        return new GifticonProductListResponse(products.getContent(), pageInfo);
+        return new GifticonProductListResponse(products.getContent(), pageInfo, pointBalance);
     }
 }
