@@ -20,9 +20,10 @@ public class GifticonController {
     @GetMapping
     public ApiResponse<GifticonProductListResponse> getGifticonList(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam int size
+            @RequestParam int size,
+            @CurrentUser MemberPrincipal user
     ){
-        GifticonProductListResponse response = gifticonService.getAvailableProducts(page, size);
+        GifticonProductListResponse response = gifticonService.getAvailableProducts(page, size, user.getId());
         return ApiResponse.success(response);
     }
 

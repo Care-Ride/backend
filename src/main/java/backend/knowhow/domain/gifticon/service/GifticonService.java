@@ -39,7 +39,10 @@ public class GifticonService {
     private static final Duration IMAGE_URL_EXPIRE = Duration.ofMinutes(3); // presigned image 파기 시간
 
     @Transactional(readOnly = true)
-    public GifticonProductListResponse getAvailableProducts(int page, int size){
+    public GifticonProductListResponse getAvailableProducts(int page, int size, Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
         // 재고가 0 이상인 상품 조회 (페이징)
         Pageable pageable = PageRequest.of(page, size);
         Page<GifticonProduct> products = gifticonProductRepository.findAllByStockGreaterThan(0, pageable);
@@ -59,7 +62,7 @@ public class GifticonService {
             return GifticonProductSummary.of(product, presignedUrl);
         });
 
-        return GifticonProductListResponse.from(summaries);
+        return GifticonProductListResponse.of(summaries, member.getPointBalance());
     }
 
     // TODO: 기프티콘 구매로직 추후 개선 예정
