@@ -35,4 +35,14 @@ public class GifticonController {
         GifticonBarcodeSummary response = gifticonService.purchaseGifticon(request, user.getId());
         return ApiResponse.success(response);
     }
+
+    @GetMapping("/history")
+    public ApiResponse<GifticonProductListResponse> getGifticonHistoryList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam int size,
+            @CurrentUser MemberPrincipal user
+    ){
+        GifticonProductListResponse response = gifticonService.getGifticonHistoryList(page, size, user.getId());
+        return ApiResponse.success(response);
+    }
 }
