@@ -110,7 +110,7 @@ public class GifticonService {
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<GifticonUsage> histories = gifticonUsageRepository.findAllByBuyerAndStatus(member, GifticonUsageStatus.SUCCESS, pageable);
+        Page<GifticonUsage> histories = gifticonUsageRepository.findAllByBuyerAndStatusOrderByCreatedAtDesc(member, GifticonUsageStatus.SUCCESS, pageable);
 
         // TODO: N+1 문제 해결
         Page<GifticonHistorySummary> summaries = histories.map(history -> {
