@@ -1,7 +1,9 @@
 package backend.knowhow.domain.gifticon.controller;
 
 import backend.knowhow.domain.gifticon.dto.summary.GifticonBarcodeSummary;
+import backend.knowhow.domain.gifticon.dto.user.request.GifticonBarcodeRequest;
 import backend.knowhow.domain.gifticon.dto.user.request.GifticonPurchaseRequest;
+import backend.knowhow.domain.gifticon.dto.user.response.GifticonHistoryListResponse;
 import backend.knowhow.domain.gifticon.dto.user.response.GifticonProductListResponse;
 import backend.knowhow.domain.gifticon.service.GifticonService;
 import backend.knowhow.global.common.response.ApiResponse;
@@ -37,12 +39,21 @@ public class GifticonController {
     }
 
     @GetMapping("/history")
-    public ApiResponse<GifticonProductListResponse> getGifticonHistoryList(
+    public ApiResponse<GifticonHistoryListResponse> getGifticonHistoryList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam int size,
             @CurrentUser MemberPrincipal user
     ){
-        GifticonProductListResponse response = gifticonService.getGifticonHistoryList(page, size, user.getId());
+        GifticonHistoryListResponse response = gifticonService.getGifticonHistoryList(page, size, user.getId());
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/barcode")
+    public ApiResponse<GifticonBarcodeSummary> getGifticonHistoryList(
+            @RequestBody GifticonBarcodeRequest request,
+            @CurrentUser MemberPrincipal user
+    ){
+        GifticonBarcodeSummary response = gifticonService.getGifticonBarcode(request, user.getId());
         return ApiResponse.success(response);
     }
 }
