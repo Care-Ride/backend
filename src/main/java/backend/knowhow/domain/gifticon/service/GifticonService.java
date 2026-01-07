@@ -3,6 +3,7 @@ package backend.knowhow.domain.gifticon.service;
 import backend.knowhow.domain.gifticon.domain.Gifticon;
 import backend.knowhow.domain.gifticon.domain.GifticonProduct;
 import backend.knowhow.domain.gifticon.domain.GifticonUsage;
+import backend.knowhow.domain.gifticon.domain.GifticonUsageStatus;
 import backend.knowhow.domain.gifticon.dto.summary.GifticonBarcodeSummary;
 import backend.knowhow.domain.gifticon.dto.user.request.GifticonPurchaseRequest;
 import backend.knowhow.domain.gifticon.dto.user.response.GifticonProductListResponse;
@@ -98,5 +99,31 @@ public class GifticonService {
         String imageUrl = s3PresignedUrlProvider.getPresignedGetUrl(gifticon.getImageKey(), Duration.ofMinutes(3));
 
         return GifticonBarcodeSummary.of(gifticon, imageUrl);
+    }
+
+    @Transactional(readOnly = true)
+    public GifticonProductListResponse getGifticonHistoryList(int page, int size, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GifticonUsage> histories = gifticonUsageRepository.findAllByBuyerAndStatus(member, GifticonUsageStatus.SUCCESS, pageable);
+
+        Page<GifticonProductSummary> summaries = histories.map(history -> {
+            GifticonProduct product = history.getGifticon().getProduct();
+            // 이미지 비어있으면 null값 입력
+            String imageKey = product.getImageKey();
+            if(imageKey== null || imageKey.isBlank()){
+                return GifticonProductSummary.of(product, null);
+            }
+
+            String presignedUrl = s3PresignedUrlProvider.getPresignedGetUrl(
+                    imageKey,
+                    IMAGE_URL_EXPIRE
+            );
+            return GifticonProductSummary.of(product, presignedUrl);
+        });
+
+        return GifticonProductListResponse.of(summaries, member.getPointBalance());
     }
 }
