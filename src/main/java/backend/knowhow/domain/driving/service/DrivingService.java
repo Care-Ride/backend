@@ -3,7 +3,7 @@ package backend.knowhow.domain.driving.service;
 import backend.knowhow.domain.driving.domain.DrivingSession;
 import backend.knowhow.domain.driving.domain.WeatherCondition;
 import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
-import backend.knowhow.domain.driving.dto.request.LocationRequest;
+import backend.knowhow.domain.driving.dto.request.DriveStartRequest;
 import backend.knowhow.domain.driving.dto.response.*;
 import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
 import backend.knowhow.domain.driving.dto.response.kakao.KakaoPlaceSearchResponse;
@@ -16,6 +16,8 @@ import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.mission.domain.MissionCode;
 import backend.knowhow.domain.mission.service.MissionService;
+import backend.knowhow.domain.vehicle.domain.Vehicle;
+import backend.knowhow.domain.vehicle.repository.VehicleRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +43,14 @@ public class DrivingService {
     private final MemberRepository memberRepository;
     private final WeatherConditionMapper weatherConditionMapper;
     private final MissionService missionService;
+    private final VehicleRepository vehicleRepository;
 
     private static final LocalTime NIGHT_START = LocalTime.of(20, 0);   // 20:00
     private static final LocalTime NIGHT_END = LocalTime.of(6, 0);  // 6:00
     private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Transactional(readOnly = true)
-    public BeforeDriveDangerResponse getDangerBeforeDrive(LocationRequest request) {
+    public BeforeDriveDangerResponse getDangerBeforeDrive(DriveStartRequest request) {
         // 현재 위치 기준 현재 날씨 조회
         KmaUltraSrtNcstResponse ultraSrtNcst = kmaWeatherClient.getUltraSrtNcst(request.getLat(), request.getLon());
         WeatherCondition weatherCondition = weatherConditionMapper.fromUltraSrtNcst(ultraSrtNcst);  // 날씨 상태 enum값
@@ -82,14 +85,21 @@ public class DrivingService {
     }
 
     @Transactional
-    public DriveStartResponse startDriving(Long memberId, LocationRequest request) {
+    public DriveStartResponse startDriving(Long memberId, DriveStartRequest request) {
         Member driver = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        Vehicle activeVehicle = vehicleRepository
+                .findByOwnerIdAndActiveTrue(driver.getId())
+                .orElse(null);
+
+        // 포인트 적립 대상 조건 : active 차량 존재 && 차량에 BLE 등록 && BLE 연결 상태
+        boolean pointEligible = activeVehicle != null && activeVehicle.getBleDeviceId() != null && request.isBleConnected();
 
         // 운전 시작 시 챌린지형 미션 리셋
         missionService.resetChallengeMissionsForDrive(driver);
 
-        DrivingSession drive = DrivingSession.start(driver, request.getLat(), request.getLon());
+        DrivingSession drive = DrivingSession.start(driver, activeVehicle, request.getLat(), request.getLon(), pointEligible);
         DrivingSession saveDrive = drivingSessionRepository.save(drive);
         return new DriveStartResponse(saveDrive.getId(), saveDrive.getStartTime());
     }
@@ -102,8 +112,9 @@ public class DrivingService {
                 .orElseThrow(() -> new BaseException(ErrorType.DRIVE_SESSION_NOT_FOUND));
 
         // driveSession 운전자와 로그인한 유저가 다른 경우 에러
-        if(!driveSession.getDriver().equals(driver))
+        if (!driveSession.getDriver().getId().equals(driver.getId())) {
             throw new BaseException(ErrorType.DRIVE_ACCESS_DENIED);
+        }
         // 이미 종료처리가 되어있는 경우 에러 처리
         if(driveSession.getEndTime() != null){
             throw new BaseException(ErrorType.DRIVE_ALREADY_ENDED);

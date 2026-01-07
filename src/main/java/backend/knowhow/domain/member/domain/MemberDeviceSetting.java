@@ -23,7 +23,7 @@ public class MemberDeviceSetting {
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
-    // 글자 크기 (1~3), 기본 2
+    // 글자 크기 (1~6), 기본 2
     @Column(name = "font_level", nullable = false)
     private int fontLevel;
 
@@ -48,7 +48,7 @@ public class MemberDeviceSetting {
     }
 
     private void validateLevel(int level, String fieldName) {
-        if (level < 1 || level > 5) {
+        if (level < 1 || level > 6) {
             throw new BaseException(ErrorType.INVALID_SETTING_LEVEL);
         }
     }
