@@ -12,7 +12,10 @@ import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
 import backend.knowhow.domain.driving.service.kakaoMap.KakaoApiClient;
 import backend.knowhow.domain.driving.service.weather.KmaWeatherClient;
 import backend.knowhow.domain.driving.service.weather.WeatherConditionMapper;
+import backend.knowhow.domain.member.domain.GuardianLink;
 import backend.knowhow.domain.member.domain.Member;
+import backend.knowhow.domain.member.domain.Role;
+import backend.knowhow.domain.member.repository.GuardianLinkRepository;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.mission.domain.MissionCode;
 import backend.knowhow.domain.mission.service.MissionService;
@@ -30,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +48,7 @@ public class DrivingService {
     private final WeatherConditionMapper weatherConditionMapper;
     private final MissionService missionService;
     private final VehicleRepository vehicleRepository;
+    private final GuardianLinkRepository guardianLinkRepository;
 
     private static final LocalTime NIGHT_START = LocalTime.of(20, 0);   // 20:00
     private static final LocalTime NIGHT_END = LocalTime.of(6, 0);  // 6:00
@@ -132,9 +137,16 @@ public class DrivingService {
 
     @Transactional(readOnly = true)
     public DailyDrivingListResponse getDailyDrivingRecords(LocalDate date, Long memberId) {
-        Member driver = memberRepository.findById(memberId)
+        Member loginMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
-        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeGreaterThanEqualAndStartTimeLessThanAndEndTimeIsNotNull(driver.getId(), date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+
+        // 만약 사용자가 GUARDIAN role을 가지고 있으면 연결된 운전자 기록 보여주기 (없다면 빈 리스트 반환)
+        Member targetMember = determineDrivingRecordMember(loginMember);
+        if(targetMember == null){
+            return new DailyDrivingListResponse(List.of(), date);
+        }
+
+        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeGreaterThanEqualAndStartTimeLessThanAndEndTimeIsNotNull(targetMember.getId(), date.atStartOfDay(), date.plusDays(1).atStartOfDay());
         List<DrivingSessionSummary> dtoList = drivingList.stream()
                 .map(DrivingSessionSummary::from)
                 .collect(Collectors.toList());
@@ -144,7 +156,7 @@ public class DrivingService {
 
     @Transactional(readOnly = true)
     public MonthlyDriveResponse getMonthlyDrivingRecords(String yearMonth, Long memberId) {
-        Member driver = memberRepository.findById(memberId)
+        Member loginMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
 
         YearMonth month;
@@ -156,8 +168,14 @@ public class DrivingService {
         LocalDateTime startTime = month.atDay(1).atStartOfDay();
         LocalDateTime endTime = month.plusMonths(1).atDay(1).atStartOfDay();    //다음달 1일 00:00
 
+        // 만약 사용자가 GUARDIAN role을 가지고 있으면 연결된 운전자 기록 보여주기 (없다면 빈값 반환)
+        Member targetMember = determineDrivingRecordMember(loginMember);
+        if(targetMember == null){
+            return new MonthlyDriveResponse(month.getMonthValue(), 0,0,0);
+        }
+
         // 운전 완료되지 않은 경우 제외한 운전 목록
-        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetweenAndEndTimeIsNotNull(driver.getId(), startTime, endTime);
+        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetweenAndEndTimeIsNotNull(targetMember.getId(), startTime, endTime);
 
         int hardAccelSum = drivingList.stream().mapToInt(DrivingSession::getHardAccelCount).sum();
         int hardDecelSum = drivingList.stream().mapToInt(DrivingSession::getHardDecelCount).sum();
@@ -223,4 +241,15 @@ public class DrivingService {
         }
     }
 
+    private Member determineDrivingRecordMember(Member member){
+        // 만약 사용자가 GUARDIAN role을 가지고 있으면 연결된 운전자 기록 보여주기 (없다면 빈 리스트 반환)
+        if(member.getRole() == Role.GUARDIAN){
+            Optional<GuardianLink> guardianLink = guardianLinkRepository.findByGuardianId(member.getId());
+            if(guardianLink.isEmpty()){
+                return null;
+            }
+            return guardianLink.get().getSenior();
+        }
+        else return member;
+    }
 }
