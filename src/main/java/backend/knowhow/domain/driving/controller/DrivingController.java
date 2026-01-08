@@ -9,6 +9,7 @@ import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.security.CurrentUser;
 import backend.knowhow.global.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public class DrivingController {
     private final DrivingService drivingService;
 
     // 운전 시작 전 위험요소 조회
+    @PreAuthorize("hasRole('SENIOR')")
     @PostMapping("/danger")
     public ApiResponse<BeforeDriveDangerResponse> getDanger(@RequestBody DriveStartRequest request){
         BeforeDriveDangerResponse response = drivingService.getDangerBeforeDrive(request);
@@ -28,6 +30,7 @@ public class DrivingController {
     }
 
     // 목적지 검색
+    @PreAuthorize("hasRole('SENIOR')")
     @GetMapping("/dst/search/{keyword}")
     public ApiResponse<PlaceSearchListResponse> searchDst(@PathVariable String keyword){
         PlaceSearchListResponse response = drivingService.searchDst(keyword);
@@ -35,6 +38,7 @@ public class DrivingController {
     }
 
     // 운전 시작
+    @PreAuthorize("hasRole('SENIOR')")
     @PostMapping("/start")
     public ApiResponse<DriveStartResponse> startDriving(
             @RequestBody DriveStartRequest driveStartRequest,
@@ -45,6 +49,7 @@ public class DrivingController {
     }
 
     // 운전 종료
+    @PreAuthorize("hasRole('SENIOR')")
     @PostMapping("/end")
     public ApiResponse<DrivingSessionSummary> endDriving(
             @RequestBody DriveEndRequest request,
