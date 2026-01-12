@@ -1,6 +1,6 @@
 package backend.knowhow.domain.driving.service.weather;
 
-import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
+import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtFcstResponse;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class KmaWeatherClient {
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm");
 
-    public KmaUltraSrtNcstResponse getUltraSrtNcst(double lat, double lan) {
+    public KmaUltraSrtFcstResponse getUltraSrtFcst(double lat, double lan) {
         // 위도경도 -> 기상청 격자로 반환
         GpsUtils.LatXLngY latXLngY = gpsUtils.convertGRID_GPS(GpsUtils.TO_GRID, lat, lan);
 
@@ -44,7 +44,7 @@ public class KmaWeatherClient {
         String baseTime = String.format("%02d00", baseDateTime.getHour());
 
         String url = UriComponentsBuilder
-                .fromHttpUrl(baseUrl + "/getUltraSrtNcst")
+                .fromHttpUrl(baseUrl + "/getUltraSrtFcst")
                 .queryParam("serviceKey", serviceKey)
                 .queryParam("pageNo", 1)
                 .queryParam("numOfRows", 1000)
@@ -56,13 +56,13 @@ public class KmaWeatherClient {
                 .toUriString();
 
         try {
-            KmaUltraSrtNcstResponse response = restTemplate.getForObject(url, KmaUltraSrtNcstResponse.class);
+            KmaUltraSrtFcstResponse response = restTemplate.getForObject(url, KmaUltraSrtFcstResponse.class);
             if (response == null){
                 throw new BaseException(ErrorType.KMA_WEATHER_ERROR);
             }
             return response;
         } catch (Exception e) {
-            log.error("[KmaWeatherClient] getUltraSrtNcst error. lat={}, lan={}, url={}, message={}", lat, lan, url, e.getMessage(), e);
+            log.error("[KmaWeatherClient] getUltraSrtFcst error. lat={}, lan={}, url={}, message={}", lat, lan, url, e.getMessage(), e);
             throw new BaseException(ErrorType.KMA_WEATHER_ERROR);
         }
     }

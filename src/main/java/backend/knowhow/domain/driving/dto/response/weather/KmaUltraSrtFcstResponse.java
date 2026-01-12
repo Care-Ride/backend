@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class KmaUltraSrtNcstResponse {
+public class KmaUltraSrtFcstResponse {
 
     private Response response;
 
@@ -40,7 +40,7 @@ public class KmaUltraSrtNcstResponse {
         private String baseDate;
         private String baseTime;
         private String category;   // T1H, REH, WSD, RN1, PTY 등
-        private String obsrValue;  // 관측값
+        private String fcstValue;  // 관측값
         private int nx;
         private int ny;
     }
