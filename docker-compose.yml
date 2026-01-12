@@ -12,6 +12,9 @@ services:
         condition: service_started
       mysql:
         condition: service_healthy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       SPRING_PROFILES_ACTIVE: dev
       REDIS_HOST: redis
