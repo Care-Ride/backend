@@ -1,39 +1,101 @@
 package backend.knowhow.domain.member.domain;
 
+import backend.knowhow.domain.auth.domain.SocialType;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
+import backend.knowhow.global.common.exception.BaseException;
+import backend.knowhow.global.common.response.ErrorType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"social_type", "social_id"}))
 public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private Long kakaoId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "social_type", nullable = false)
+    private SocialType socialType;
 
+
+    @Column(name = "social_id", nullable = false)
+    private String socialId;
+
+    @Column(nullable = false)
     private String nickname;
 
     @Setter
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public Member(KakaoUserInfo info) {
-        this.kakaoId = info.getId();
-        this.nickname = info.getNickname();
-        this.role = Role.NONE;
+    // 현재 보유 포인트
+    @Column(nullable = false)
+    private int pointBalance = 0;
+
+    // 정적 팩토리 메서드
+
+    public static Member createKakaoMember(KakaoUserInfo info) {
+        Member member = new Member();
+        member.socialType = SocialType.KAKAO;
+        member.socialId = String.valueOf(info.id());
+        member.nickname = info.nickname();
+        member.role = Role.NONE;
+        return member;
     }
 
-    // 테스트 계정 생성자
-    public Member(String nickname, Role role) {
-        this.nickname = nickname;
-        this.role = role;
+    public static Member createGoogleMember(String googleSub, String nickname) {
+        Member member = new Member();
+        member.socialType = SocialType.GOOGLE;
+        member.socialId = googleSub;
+        member.nickname = (nickname == null || nickname.isBlank())
+                ? generateTempNickname()
+                : nickname;
+        member.role = Role.NONE;
+        return member;
+    }
+
+    public static Member createTestMember(String nickname, Role role) {
+        Member member = new Member();
+        member.socialType = SocialType.TEST;
+        member.socialId = "TEST_" + UUID.randomUUID();
+        member.nickname = nickname;
+        member.role = role;
+        return member;
+    }
+
+    // 도메인 메서드
+
+    public void addPoint(int amount) {
+        if (amount <= 0) {
+            throw new BaseException(ErrorType.INVALID_POINT_AMOUNT);
+        }
+        this.pointBalance += amount;
+    }
+
+    public void usePoint(int amount) {
+        if (amount <= 0) {
+            throw new BaseException(ErrorType.INVALID_POINT_AMOUNT);
+        }
+        if (this.pointBalance < amount) {
+            throw new BaseException(ErrorType.INSUFFICIENT_POINTS);
+        }
+        this.pointBalance -= amount;
+    }
+
+    // 내부 메서드
+
+    // 구글 로그인 시 닉네임 없으면 임시 닉네임 생성
+    private static String generateTempNickname() {
+        return "USER_" + UUID.randomUUID().toString().substring(0, 8);
     }
 
 

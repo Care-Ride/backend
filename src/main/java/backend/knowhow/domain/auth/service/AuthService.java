@@ -1,32 +1,80 @@
 package backend.knowhow.domain.auth.service;
 
+import backend.knowhow.domain.auth.domain.SocialType;
+import backend.knowhow.domain.auth.dto.response.GoogleUserInfo;
+import backend.knowhow.domain.auth.dto.response.LoginResponse;
+import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
 import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.domain.Role;
 import backend.knowhow.domain.auth.dto.response.AuthResponse;
 import backend.knowhow.domain.auth.dto.response.KakaoUserInfo;
+import backend.knowhow.domain.member.repository.GuardianLinkRepository;
+import backend.knowhow.domain.member.repository.MemberDeviceSettingRepository;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.domain.auth.repository.RefreshTokenRepository;
+import backend.knowhow.domain.member.service.MemberDeviceSettingService;
+import backend.knowhow.domain.mission.repository.MemberMissionRepository;
+import backend.knowhow.domain.mission.repository.PointHistoryRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
-import backend.knowhow.global.config.JwtUtil;
+import backend.knowhow.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final MemberDeviceSettingService deviceSettingService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final GuardianLinkRepository guardianLinkRepository;
+    private final DrivingSessionRepository drivingSessionRepository;
+    private final MemberDeviceSettingRepository memberDeviceSettingRepository;
+    private final PointHistoryRepository pointHistoryRepository;
+    private final MemberMissionRepository memberMissionRepository;
     private final KakaoAuthService kakaoAuthService;
+    private final GoogleAuthService googleAuthService;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse loginKakao(String accessToken) {
+    // Kakao Login
+    public LoginResponse loginKakao(String accessToken){
 
         KakaoUserInfo userInfo = kakaoAuthService.getUserInfo(accessToken);
+        String socialId = String.valueOf(userInfo.id());
 
-        Member member = memberRepository.findByKakaoId(userInfo.getId())
-                .orElseGet(() -> memberRepository.save(new Member(userInfo)));
+        Member member = memberRepository
+                .findBySocialTypeAndSocialId(SocialType.KAKAO, socialId)
+                .orElseGet(() ->
+                        memberRepository.save(
+                                Member.createKakaoMember(userInfo)
+                        )
+                );
+
+        return issueTokens(member);
+    }
+
+    // Google Login
+    public LoginResponse loginGoogle(String idToken) {
+
+        GoogleUserInfo userInfo = googleAuthService.getUserInfo(idToken);
+
+        Member member = memberRepository.findBySocialTypeAndSocialId(
+                        SocialType.GOOGLE,
+                        userInfo.sub())
+                .orElseGet(()->
+                        memberRepository.save(
+                                Member.createGoogleMember(userInfo.sub(), userInfo.nickname())
+                        )
+                );
+
+        return issueTokens(member);
+    }
+
+    // Token Issue
+    private LoginResponse issueTokens(Member member) {
 
         // accessToken 발급
         String access = jwtUtil.createAccessToken(member.getId(), member.getRole());
@@ -35,12 +83,19 @@ public class AuthService {
         String refresh = jwtUtil.createRefreshToken(member.getId());
         refreshTokenRepository.save(member.getId(), refresh);
 
-        return new AuthResponse(access, refresh);
+        // 화면 세팅 여부
+        boolean hasDeviceSetting = deviceSettingService.existsSettingByMember(member);
+
+        return new LoginResponse(access, refresh, hasDeviceSetting);
     }
 
     public AuthResponse selectRole(Long memberId, Role role) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        if (role == Role.ADMIN) {
+            throw new BaseException(ErrorType.INVALID_ROLE);
+        }
 
         member.setRole(role);
         memberRepository.save(member);
@@ -72,5 +127,20 @@ public class AuthService {
 
     public void logout(Long memberId) {
         refreshTokenRepository.delete(memberId);
+    }
+
+    @Transactional
+    public void withdraw(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorType.MEMBER_NOT_FOUND));
+
+        refreshTokenRepository.delete(memberId);
+        guardianLinkRepository.deleteByGuardianIdOrSeniorId(memberId);
+        drivingSessionRepository.deleteByDriver_Id(memberId);
+        memberDeviceSettingRepository.deleteByMemberId(memberId);
+        pointHistoryRepository.deleteByMemberId(memberId);
+        memberMissionRepository.deleteByMemberId(memberId);
+        memberRepository.delete(member);
     }
 }

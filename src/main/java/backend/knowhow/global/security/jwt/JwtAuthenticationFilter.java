@@ -1,10 +1,10 @@
-package backend.knowhow.global.security;
+package backend.knowhow.global.security.jwt;
 
 import backend.knowhow.domain.member.domain.Member;
 import backend.knowhow.domain.member.repository.MemberRepository;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ErrorType;
-import backend.knowhow.global.config.JwtUtil;
+import backend.knowhow.global.security.MemberPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

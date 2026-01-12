@@ -9,7 +9,7 @@ import backend.knowhow.domain.test.dto.TokenResponse;
 import backend.knowhow.global.common.exception.BaseException;
 import backend.knowhow.global.common.response.ApiResponse;
 import backend.knowhow.global.common.response.ErrorType;
-import backend.knowhow.global.config.JwtUtil;
+import backend.knowhow.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +28,7 @@ public class TestAuthController {
     public ApiResponse<TestMemberResponse> createTestMember(
             @RequestBody TestMemberRequest request
     ) {
-        Member member = new Member(request.nickname(), request.role());
+        Member member = Member.createTestMember(request.nickname(), request.role());
         memberRepository.save(member);
 
         return ApiResponse.success(new TestMemberResponse(member.getId()));

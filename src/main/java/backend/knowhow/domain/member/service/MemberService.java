@@ -20,7 +20,8 @@ public class MemberService {
 
         return new MemberInfoResponse(
                 member.getId(),
-                member.getNickname()
+                member.getNickname(),
+                member.getRole()
         );
     }
 }

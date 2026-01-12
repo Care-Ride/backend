@@ -11,7 +11,6 @@ public class DriveEndRequest {
     private int hardAccelCount;
     private int hardDecelCount;
     private int suddenStopCount;
-    private int score;
     private double lat;
     private double lon;
 }

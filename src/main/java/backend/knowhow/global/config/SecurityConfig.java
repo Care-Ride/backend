@@ -2,7 +2,7 @@ package backend.knowhow.global.config;
 
 import backend.knowhow.global.security.CustomAccessDeniedHandler;
 import backend.knowhow.global.security.CustomAuthenticationEntryPoint;
-import backend.knowhow.global.security.JwtAuthenticationFilter;
+import backend.knowhow.global.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,13 +48,15 @@ public class SecurityConfig {
                     }
                     req.requestMatchers(
                             "/auth/kakao",
+                            "/auth/google",
                             "/auth/refresh",
                             "/auth/test/*"
                     ).permitAll();
                     req.requestMatchers(
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
-                            "/api-docs/**"
+                            "/api-docs/**",
+                            "/location/**"
                     ).permitAll();
                     req.requestMatchers("/auth/**").authenticated();
                     req.anyRequest().authenticated();
