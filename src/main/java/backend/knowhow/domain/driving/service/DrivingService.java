@@ -5,7 +5,7 @@ import backend.knowhow.domain.driving.domain.WeatherCondition;
 import backend.knowhow.domain.driving.dto.request.DriveEndRequest;
 import backend.knowhow.domain.driving.dto.request.DriveStartRequest;
 import backend.knowhow.domain.driving.dto.response.*;
-import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtNcstResponse;
+import backend.knowhow.domain.driving.dto.response.weather.KmaUltraSrtFcstResponse;
 import backend.knowhow.domain.driving.dto.response.kakao.KakaoPlaceSearchResponse;
 import backend.knowhow.domain.driving.dto.summary.DrivingSessionSummary;
 import backend.knowhow.domain.driving.repository.DrivingSessionRepository;
@@ -57,8 +57,8 @@ public class DrivingService {
     @Transactional(readOnly = true)
     public BeforeDriveDangerResponse getDangerBeforeDrive(DriveStartRequest request) {
         // 현재 위치 기준 현재 날씨 조회
-        KmaUltraSrtNcstResponse ultraSrtNcst = kmaWeatherClient.getUltraSrtNcst(request.getLat(), request.getLon());
-        WeatherCondition weatherCondition = weatherConditionMapper.fromUltraSrtNcst(ultraSrtNcst);  // 날씨 상태 enum값
+        KmaUltraSrtFcstResponse ultraSrtNcst = kmaWeatherClient.getUltraSrtFcst(request.getLat(), request.getLon());
+        WeatherCondition weatherCondition = weatherConditionMapper.fromUltraSrtFcst(ultraSrtNcst);  // 날씨 상태 enum값
 
         // 현재 시간 기준 야간운전인지 여부 확인
         LocalTime now = LocalTime.now();
