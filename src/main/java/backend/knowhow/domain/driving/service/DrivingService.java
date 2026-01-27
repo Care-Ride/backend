@@ -175,7 +175,7 @@ public class DrivingService {
         }
 
         // 운전 완료되지 않은 경우 제외한 운전 목록
-        List<DrivingSession> drivingList = drivingSessionRepository.findAllByDriverIdAndStartTimeBetweenAndEndTimeIsNotNull(targetMember.getId(), startTime, endTime);
+        List<DrivingSession> drivingList = drivingSessionRepository.findValidDrivingSessions(targetMember.getId(), startTime, endTime);
 
         int hardAccelSum = drivingList.stream().mapToInt(DrivingSession::getHardAccelCount).sum();
         int hardDecelSum = drivingList.stream().mapToInt(DrivingSession::getHardDecelCount).sum();
@@ -189,15 +189,15 @@ public class DrivingService {
                 .filter(Objects::nonNull)
                 .mapToDouble(DrivingSession::getDistance).sum();
 
-        int hardAccelStar = drivingEventStarCalculator(hardAccelSum, totalDistance);
-        int hardDecelStar = drivingEventStarCalculator(hardDecelSum, totalDistance);
+        int hardAccelStar = drivingEventStarCalculatorForMonth(hardAccelSum, totalDistance);
+        int hardDecelStar = drivingEventStarCalculatorForMonth(hardDecelSum, totalDistance);
 
         return new MonthlyDriveResponse(month.getMonthValue(), avgDrivingScore, hardAccelStar, hardDecelStar);
     }
 
     // 운전 종료 시 급가속, 급감속 기반 점수 산정
     private int calculateDrivingScore(int hardAccel, int hardDecel, double distance){
-        if(distance == 0) return 0;
+        if(distance <= 0.5 ) return -1; // 주행거리가 0.5km 이하인 경우에는 점수 반영x
 
         double ratePer100km = (hardAccel + hardDecel) / distance * 100.0;
         int score = (int) Math.round(100 - ratePer100km);
@@ -207,7 +207,7 @@ public class DrivingService {
     }
 
     // 급가속, 급가속 월별 점수 계산
-    private int drivingEventStarCalculator(int eventCount, double totalDistance){
+    private int drivingEventStarCalculatorForMonth(int eventCount, double totalDistance){
         if(totalDistance <= 0.0) return 0;
 
         double ratePer100km = (eventCount / totalDistance) * 100.0; // 100km당 event 발생 비율
