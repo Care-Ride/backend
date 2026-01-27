@@ -212,10 +212,10 @@ public class DrivingService {
 
         double ratePer100km = (eventCount / totalDistance) * 100.0; // 100km당 event 발생 비율
 
-        if(ratePer100km <= 2.0) return 5;
-        else if(ratePer100km <= 5.0) return 4;
-        else if(ratePer100km <= 9.0) return 3;
-        else if(ratePer100km <= 14.0) return 2;
+        if(ratePer100km <= 4.0) return 5;
+        else if(ratePer100km <= 9.0) return 4;
+        else if(ratePer100km <= 14.0) return 3;
+        else if(ratePer100km <= 20.0) return 2;
         else return 1;
     }
 
