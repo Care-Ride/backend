@@ -1,5 +1,6 @@
 package backend.knowhow.global.config;
 
+import backend.knowhow.global.handler.StompHandler;
 import backend.knowhow.global.security.jwt.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtInterceptor jwtInterceptor;
+    private final StompHandler stompHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -30,6 +31,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(jwtInterceptor);
+        registration.interceptors(stompHandler);
     }
 }
