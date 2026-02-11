@@ -2,6 +2,7 @@ package backend.knowhow.domain.alert.service;
 
 import backend.knowhow.domain.alert.client.KoroadApiClient;
 import backend.knowhow.domain.alert.domain.KoroadHotspot;
+import backend.knowhow.domain.alert.domain.KoroadType;
 import backend.knowhow.domain.alert.dto.external.KoroadBaseResponse;
 import backend.knowhow.domain.alert.repository.KoroadHotspotRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,19 @@ public class KoroadHotspotSyncService {
 
     // Koroad API → MySQL 저장 (해당 type + 시/도 + 구/군 기준으로 전체 갱신)
     @Transactional
-    public void syncHotspots(String apiType, String type, Integer siDo, Integer guGun) {
+    public void syncHotspots(String type, Integer siDo, Integer guGun) {
         // Koroad에서 신규 데이터 가져오기
-        List<KoroadBaseResponse.Item> items = koroadApiClient.fetchHotspots(apiType, siDo, guGun);
+        List<KoroadBaseResponse.Item> items = koroadApiClient.fetchHotspots(type, siDo, guGun);
 
         if (items.isEmpty()) {
             log.warn("[KoroadHotspotSyncService] No items fetched. Skipping sync for type={}, siDo={}, guGun={}", type, siDo, guGun);
             return;
         }
 
+        KoroadType koroadType = KoroadType.from(type);
+
         // 기존 데이터 삭제 (같은 type + region 기준)
-        hotspotRepository.deleteByTypeAndSiDoAndGuGun(type, siDo, guGun);
+        hotspotRepository.deleteByTypeAndSiDoAndGuGun(koroadType, siDo, guGun);
 
         // 3) 새 데이터 저장
         List<KoroadHotspot> entities = items.stream()
@@ -45,12 +48,11 @@ public class KoroadHotspotSyncService {
                         if (item.getLoCrd() != null)
                             lon = Double.parseDouble(item.getLoCrd());
                     } catch (NumberFormatException e) {
-                        log.warn("[KoroadHotspotSyncService] invalid coord la={}, lo={}",
-                                item.getLaCrd(), item.getLoCrd());
+                        log.warn("[KoroadHotspotSyncService] invalid coord la={}, lo={}", item.getLaCrd(), item.getLoCrd());
                     }
 
                     return KoroadHotspot.builder()
-                            .type(type)
+                            .type(koroadType)
                             .afosFid(item.getAfosId())
                             .spotName(item.getSpotName())
                             .sidoSggName(item.getSidoSggName())

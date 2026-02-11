@@ -25,9 +25,9 @@ public class KoroadHotspotMapper {
         int m = (int) Math.round(dist);
 
         String typeLabel = switch (hotspot.getType()) {
-            case "OLD_MAN" -> "보행 노인 교통사고 다발지역";
-            case "CHILD" -> "보행 어린이 교통사고 다발지역";
-            case "SCHOOL" -> "어린이 보호구역 내 교통사고 다발지역";
+            case OLD_MAN -> "보행 노인 교통사고 다발지역";
+            case CHILD -> "보행 어린이 교통사고 다발지역";
+            case SCHOOL -> "어린이 보호구역 내 교통사고 다발지역";
             default -> "교통사고 다발지역";
         };
 
